@@ -1,45 +1,37 @@
-import urllib.request, json
 import pandas as pd
 from util import *
-from scheduleObjects import Course, Schedule
-from courseData import courseData
+from scheduleObjects import Course, Schedule, Agenda
+from courseData import CourseData
 
 # Courses you want
-my_courses = []
+course_key_list = []
 
-# Get all course data from url
-def save_course_dictionary():
-    url = "https://hyperschedule.herokuapp.com/api/v3/courses?school=hmc"
-    data = urllib.request.urlopen(url).read().decode()
-    data_dict = json.loads(data)
-    save_json(data_dict)
-
-# Save json data to file
-def save_json(data):
-    with open('data.txt', 'w') as outfile:
-        json.dump(data, outfile)
-
-# Retrieve json data from file
-def retrieve_local_data():
-    with open('data.txt') as json_file:
-        data = json.load(json_file)
-    return data
-
-
-# data_dict = retrieve_local_data()
-# courses = data_dict['data']['courses']
-
-courseData = courseData(local=True)
+courseData = CourseData(local=True)
 courses = courseData.courses
 
-searches =  [course['courseSortKey'][0] + ' ' + str(course['courseSortKey'][1]) + ' ' + \
-            course['courseName'] for course in courses.values()]
-
-econ1 = Course(courses['ENGR 079 HM-05'])
-econ2 = Course(courses['ECON 142 PZ-01'])
+# econ1 = Course(courses['ENGR 079 HM-05'])
+# econ2 = Course(courses['ECON 142 PZ-01'])
 
 # print(econ1.full())
 # print(econ2.full())
 # print(course_conflict(econ1, econ2))
 
-print(courseData.search('data structures 70'))
+results = get_groups(courseData.search('electromagnetic theory'))
+class1 = results['PHYS 051 HM']
+
+results = get_groups(courseData.search('engineering'))
+class2 = results['ENGR 079 HM']
+
+results = get_groups(courseData.search('data structures'))
+class3 = results['CSCI 070 HM']
+
+# courses = [class1, class2, class3]
+courses = [class1, class2]
+agenda = Agenda(courses, courseData)
+
+# print(courseData.schedule_conflict(['PHYS 051 HM-05', 'ENGR 079 HM-04']))
+
+# sections = agenda.possible_sections(courses)
+
+for sched in agenda.all_courses:
+    print(sched)

@@ -1,7 +1,10 @@
 import json
+import urllib.request, json
+from util import *
+from scheduleObjects import Course, Schedule
 import re
 
-class courseData:
+class CourseData:
     # Constructor
     def __init__(self, local=False):
         if local:
@@ -28,4 +31,20 @@ class courseData:
         for word in keyword:
             reSearch = reSearch + '(?=.*' + word + ')'
         return [self.searchDict[key] for key in self.searchDict.keys() if re.search(reSearch, key.lower())]
+
+
+    # Converts a course code into a course object
+    def codeToCourse(self, code):
+        return Course(self.courses[code])
+
+    
+    # Check to see if theres a conflict with the code list given
+    def schedule_conflict(self, codeList):
+        courses = [self.codeToCourse(code) for code in codeList]
+        length = len(courses)
+        for i in range(0, length - 1):
+            for j in range(i + 1, length):
+                if course_conflict(courses[i], courses[j]):
+                    return True
+        return False
         

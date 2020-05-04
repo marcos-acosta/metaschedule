@@ -14,6 +14,7 @@ class Course:
         self.seatsFilled = obj['courseSeatsFilled']
         self.waitlistLength = obj['courseWaitlistLength']
         self.enrollmentStatus = obj['courseEnrollmentStatus']
+        self.root = self.code.split('-')[0]
 
     def __repr__(self):
         return  '[' + self.code + '] ' + \
@@ -44,6 +45,7 @@ class Course:
 
 # Schedule class
 class Schedule:
+    # Constructor
     def __init__(self, obj):
         self.days = obj['scheduleDays']
         self.endDate = obj['scheduleEndDate']
@@ -56,3 +58,37 @@ class Schedule:
     
     def __repr__(self):
         return 'Meets ' + self.days + ', from ' + self.startTime + ' to ' + self.endTime + '.'
+
+# Agenda class
+class Agenda:
+    # Constructor
+    def __init__(self, courses, courseData):
+        self.courses = courses
+        self.data = courseData
+        self.all_courses = self.possible_sections()
+        self.clean_conflicts()
+        
+
+    def possible_sections(self):
+        courses = sorted(self.courses, key=len)
+        return self.recurse_courses(courses, [], [])
+
+
+    def recurse_courses(self, courses, meta, building, top_level=True):
+        if len(courses) == 0:
+            meta.append(building)
+            return
+        for section in courses[0]:
+            if top_level:
+                # Get the ball rolling
+                self.recurse_courses(courses[1:], meta, [section], False)
+            else:
+                building.append(section)
+                self.recurse_courses(courses[1:], meta, building.copy(), False)
+                building.remove(section)
+        if top_level:
+            return meta
+
+    
+    def clean_conflicts(self):
+        self.all_courses = [codeList for codeList in self.all_courses if not self.data.schedule_conflict(codeList)]
