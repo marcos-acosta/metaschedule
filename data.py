@@ -16,3 +16,6 @@ searches =  [course['courseCode'] + ' ' + \
                     course['courseName'] for course in COURSES.values()]
 keys = list(COURSES.keys())
 SEARCH_DICT = {searches[i]: keys[i] for i in range(len(keys))}
+
+def course_status(code):
+    return COURSES[code]['courseEnrollmentStatus']

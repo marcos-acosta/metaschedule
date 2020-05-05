@@ -1,6 +1,6 @@
 import math
 import re
-from data import SEARCH_DICT, COURSES
+from data import SEARCH_DICT, COURSES, course_status
 
 # Regular time to military time
 def military_time(time):
@@ -96,5 +96,21 @@ def filter_results(all_courses, codes):
 def check_filters(row, columns, codes):
     for i, column in enumerate(columns):
         if row[column] != codes[i]:
+            return False
+    return True
+
+
+def filter_closed(courses):
+    for sections in courses:
+        for section in sections:
+            if course_status(section) == 'closed':
+                sections.remove(section)
+    return courses
+
+
+def check_courses(courses):
+    # Make sure you have at least one section of each
+    for sections in courses:
+        if len(sections) == 0:
             return False
     return True

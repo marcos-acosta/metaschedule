@@ -26,13 +26,19 @@ class7 = results['MUS 067 HM']
 # courses = [class1, class2]
 courses = [class1, class2, class3, class4, class5, class6, class7]
 
+courses = filter_closed(courses)
+
+print('Courses okay?', check_courses(courses))
+
 all_courses = get_all_permutations(courses)
 
-print(len(all_courses))
+print('Full metaschedule length:', len(all_courses))
 
 # all_courses_c = [Collection(col) for col in all_courses]
 # all_courses_c = sorted(all_courses, key=lambda x: -x.availability)
 
-filtered = filter_results(all_courses, ['PHYS 050 HM-02', 'CSCI 070 HM-04'])
+filtered = filter_results(all_courses, ['PHYS 050 HM-02', 'CSCI 070 HM-04', 'CSCI 070L HM-02'])
 
-print(len(filtered))
+print('Filtered courses okay?', (filtered is not None) and (len(filtered) != 0))
+
+print('Filtered metaschedule length:', len(filtered))
