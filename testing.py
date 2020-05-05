@@ -23,21 +23,16 @@ class6 = results['CSCI 070L HM']
 results = get_groups(search('film music'))
 class7 = results['MUS 067 HM']
 
-courses = [class1, class2]
-# courses = [class1, class2, class3, class4, class5, class6, class7]
+# courses = [class1, class2]
+courses = [class1, class2, class3, class4, class5, class6, class7]
 
 all_courses = get_all_permutations(courses)
 
-# all_courses_c = [Collection(col) for col in all_courses]
+print(len(all_courses))
 
+# all_courses_c = [Collection(col) for col in all_courses]
 # all_courses_c = sorted(all_courses, key=lambda x: -x.availability)
 
-for col in all_courses:
-    print(col)
-print(' ')
-filtered = filter_results(all_courses, 'ENGR 079 HM-04')
+filtered = filter_results(all_courses, ['PHYS 050 HM-02', 'CSCI 070 HM-04'])
 
-for col in filtered:
-    print(col)
-
-# print(all_courses[-1].availability)
+print(len(filtered))

@@ -80,11 +80,21 @@ def search(keyword):
     return [SEARCH_DICT[key] for key in SEARCH_DICT.keys() if re.search(reSearch, key.lower())]
 
 
-def filter_results(all_courses, code):
-    root = code.split('-')[0]
-    column = -1
-    for i, course in enumerate(all_courses[0]):
-        if course.split('-')[0] == root:
-            column = i
-    filtered = list(filter(lambda x: x[column] == code, all_courses))
+def filter_results(all_courses, codes):
+    roots = [code.split('-')[0] for code in codes]
+    columns = []
+    for root in roots:
+        for i, course in enumerate(all_courses[0]):
+            if course.split('-')[0] == root:
+                columns.append(i)
+    if len(columns) != len(codes):
+        return None
+    filtered = [row for row in all_courses if check_filters(row, columns, codes)]
     return filtered
+
+
+def check_filters(row, columns, codes):
+    for i, column in enumerate(columns):
+        if row[column] != codes[i]:
+            return False
+    return True
