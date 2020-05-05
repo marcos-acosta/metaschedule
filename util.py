@@ -78,3 +78,13 @@ def search(keyword):
     for word in keyword:
         reSearch = reSearch + '(?=.*' + word + ')'
     return [SEARCH_DICT[key] for key in SEARCH_DICT.keys() if re.search(reSearch, key.lower())]
+
+
+def filter_results(all_courses, code):
+    root = code.split('-')[0]
+    column = -1
+    for i, course in enumerate(all_courses[0]):
+        if course.split('-')[0] == root:
+            column = i
+    filtered = list(filter(lambda x: x[column] == code, all_courses))
+    return filtered

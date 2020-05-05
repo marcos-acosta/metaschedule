@@ -28,11 +28,16 @@ courses = [class1, class2]
 
 all_courses = get_all_permutations(courses)
 
-all_courses_c = [Collection(col) for col in all_courses]
+# all_courses_c = [Collection(col) for col in all_courses]
 
-all_courses_c = sorted(all_courses_c, key=lambda x: x.availability)
+# all_courses_c = sorted(all_courses, key=lambda x: -x.availability)
 
-for col in all_courses_c:
+for col in all_courses:
+    print(col)
+print(' ')
+filtered = filter_results(all_courses, 'ENGR 079 HM-04')
+
+for col in filtered:
     print(col)
 
-print(all_courses_c[-1].availability)
+# print(all_courses[-1].availability)
