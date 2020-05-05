@@ -1,4 +1,6 @@
 import math
+import re
+from data import SEARCH_DICT, COURSES
 
 # Regular time to military time
 def military_time(time):
@@ -68,3 +70,11 @@ def get_groups(results):
             groups[result.split('-')[0]] = [result]
     return groups
 
+
+# Searches within courses by keyword
+def search(keyword):
+    keyword = keyword.lower().split(' ')
+    reSearch = ''
+    for word in keyword:
+        reSearch = reSearch + '(?=.*' + word + ')'
+    return [SEARCH_DICT[key] for key in SEARCH_DICT.keys() if re.search(reSearch, key.lower())]

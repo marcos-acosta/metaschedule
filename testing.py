@@ -1,37 +1,38 @@
-import pandas as pd
 from util import *
-from scheduleObjects import Course, Schedule, Agenda
-from courseData import CourseData
+from scheduleObjects import Course, Schedule, Collection, get_all_permutations
+from data import COURSES
 
-# Courses you want
-course_key_list = []
-
-courseData = CourseData(local=True)
-courses = courseData.courses
-
-# econ1 = Course(courses['ENGR 079 HM-05'])
-# econ2 = Course(courses['ECON 142 PZ-01'])
-
-# print(econ1.full())
-# print(econ2.full())
-# print(course_conflict(econ1, econ2))
-
-results = get_groups(courseData.search('electromagnetic theory'))
+results = get_groups(search('electromagnetic theory'))
 class1 = results['PHYS 051 HM']
 
-results = get_groups(courseData.search('engineering'))
+results = get_groups(search('engineering'))
 class2 = results['ENGR 079 HM']
 
-results = get_groups(courseData.search('data structures'))
+results = get_groups(search('data structures'))
 class3 = results['CSCI 070 HM']
 
-# courses = [class1, class2, class3]
+results = get_groups(search('physics laboratory'))
+class4 = results['PHYS 050 HM']
+
+results = get_groups(search('engineering practicum'))
+class5 = results['ENGR 079P HM']
+
+results = get_groups(search('data structures lab'))
+class6 = results['CSCI 070L HM']
+
+results = get_groups(search('film music'))
+class7 = results['MUS 067 HM']
+
 courses = [class1, class2]
-agenda = Agenda(courses, courseData)
+# courses = [class1, class2, class3, class4, class5, class6, class7]
 
-# print(courseData.schedule_conflict(['PHYS 051 HM-05', 'ENGR 079 HM-04']))
+all_courses = get_all_permutations(courses)
 
-# sections = agenda.possible_sections(courses)
+all_courses_c = [Collection(col) for col in all_courses]
 
-for sched in agenda.all_courses:
-    print(sched)
+all_courses_c = sorted(all_courses_c, key=lambda x: x.availability)
+
+for col in all_courses_c:
+    print(col)
+
+print(all_courses_c[-1].availability)
