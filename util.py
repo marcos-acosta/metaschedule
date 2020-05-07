@@ -2,6 +2,7 @@ import math
 import re
 from data import SEARCH_DICT, COURSES, course_status
 
+
 # Regular time to military time
 def military_time(time):
     time = time.split(':')
@@ -14,9 +15,7 @@ def regular_time(military):
 
 
 # Determines if two courses conflict
-def course_conflict(course_1, course_2):
-    schedules1 = course_1.schedule
-    schedules2 = course_2.schedule
+def course_conflict(schedules1, schedules2):
     for schedule1 in schedules1:
         for schedule2 in schedules2:
             if time_conflict(schedule1, schedule2):
@@ -24,6 +23,7 @@ def course_conflict(course_1, course_2):
     return False
 
 
+# Check that two strings of days have no overlap
 def different_days(days1, days2):
     for char in days1:
         if char in days2:
@@ -47,6 +47,8 @@ def time_conflict(schedule1, schedule2):
             return True
     return False
     
+''' MOVE THESE TO A SEPARATE UTIL FILE '''
+
 # Save json data to file
 def save_json(data, fname='data.txt'):
     with open(fname, 'w') as outfile:
@@ -59,6 +61,7 @@ def retrieve_local_data(fname='data.txt'):
         data = json.load(json_file)
     return data
 
+''' MOVE THESE TO A SEPARATE UTIL FILE '''
 
 # Combine results into different courses (not sections)
 def get_groups(results):
@@ -80,19 +83,23 @@ def search(keyword):
     return [SEARCH_DICT[key] for key in SEARCH_DICT.keys() if re.search(reSearch, key.lower())]
 
 
+# Filter a list of permutations by specific sections
 def filter_results(all_courses, codes):
     roots = [code.split('-')[0] for code in codes]
     columns = []
+    # Determine which columns are the ones we're interested in
     for root in roots:
         for i, course in enumerate(all_courses[0]):
             if course.split('-')[0] == root:
                 columns.append(i)
+    # That section isn't of a class here
     if len(columns) != len(codes):
         return None
     filtered = [row for row in all_courses if check_filters(row, columns, codes)]
     return filtered
 
 
+# Filter method for filter_results
 def check_filters(row, columns, codes):
     for i, column in enumerate(columns):
         if row[column] != codes[i]:
@@ -100,6 +107,7 @@ def check_filters(row, columns, codes):
     return True
 
 
+# Take out sections that are closed
 def filter_closed(courses):
     for sections in courses:
         for section in sections:
@@ -108,6 +116,7 @@ def filter_closed(courses):
     return courses
 
 
+# Make sure every course is accounted for (>=1 section)
 def check_courses(courses):
     # Make sure you have at least one section of each
     for sections in courses:

@@ -1,51 +1,6 @@
 from data import COURSES
 from util import *
 
-# Course class (all data for a single course and section)
-class Course:
-    def __init__(self, obj):
-        self.code = obj['courseCode']
-        self.name = obj['courseName']
-        self.sortKey = obj['courseSortKey']
-        self.mutualExclusionKey = obj['courseMutualExclusionKey']
-        self.description = obj['courseDescription']
-        self.instructors = obj['courseInstructors']
-        self.term = obj['courseTerm']
-        self.schedule = [Schedule(schedule_object) for schedule_object in obj['courseSchedule']]
-        self.credits = obj['courseCredits']
-        self.seatsTotal = obj['courseSeatsTotal']
-        self.seatsFilled = obj['courseSeatsFilled']
-        self.waitlistLength = obj['courseWaitlistLength']
-        self.enrollmentStatus = obj['courseEnrollmentStatus']
-        self.root = self.code.split('-')[0]
-
-    def __repr__(self):
-        return  '[' + self.code + '] ' + \
-                self.name + ', ' + \
-                self.credits + ' credits | ' + \
-                self.abridge(self.description)
-
-    def full(self):
-        return  '[' + str(self.code) + '] ' + str(self.name) + '\n' + \
-                'Sort key: ' + str(self.sortKey) + '\n' + \
-                'Mutual exlusion key: ' + str(self.mutualExclusionKey) + '\n' + \
-                'Description: ' + str(self.description) + '\n' + \
-                'Instructors: ' + str(self.instructors) + '\n' + \
-                'Term: ' + str(self.term) + '\n' + \
-                'Schedule: ' + str(self.schedule) + '\n' + \
-                'Credits: ' + str(self.credits) + '\n' + \
-                'Seats total: ' + str(self.seatsTotal) + '\n' + \
-                'Seats filled: ' + str(self.seatsFilled) + '\n' + \
-                'Waitlist length: ' + str(self.waitlistLength) + '\n' + \
-                'Enrollment status: ' + str(self.enrollmentStatus)
-
-    @staticmethod
-    def abridge(string):
-        if len(string) < 100:
-            return string
-        else:
-            return string[:100] + '...'
-
 # Schedule class (helpful way of organizing the time slots of a section)
 class Schedule:
     # Constructor
@@ -63,10 +18,10 @@ class Schedule:
         return 'Meets ' + self.days + ', from ' + self.startTime + ' to ' + self.endTime + '.'
 
 
+# A list of codes with helpful methods, for permutations
 class Collection:
     def __init__(self, codes):
         self.codes = codes
-        self.courses = [codeToCourse(code) for code in codes]
         self.credits = self.calculate_credits()
         self.availability = self.calculate_availability()
 
@@ -75,32 +30,44 @@ class Collection:
 
     def calculate_credits(self):
         credits = 0.0
-        for course in self.courses:
-            credits = credits + float(course.credits)
+        for code in self.codes:
+            credits = credits + float(codeToCredits(code))
         return credits
 
     def calculate_availability(self):
         cumulative = 0.0
-        for course in self.courses:
-            cumulative = cumulative + float(course.seatsTotal) - float(course.seatsFilled)
+        for code in self.codes:
+            cumulative = cumulative + float(codeToSeatsTotal(code)) - float(codeToSeatsFilled(code))
         return int(cumulative)
 
 
-# Converts a course code into a course object
-def codeToCourse(code):
-    return Course(COURSES[code])
+''' Course data accessor methods '''
+
+def codeToSchedule(code):
+    return [Schedule(schedule_object) for schedule_object in COURSES[code]['courseSchedule']]
+
+def codeToCredits(code):
+    return COURSES[code]['courseCredits']
+
+def codeToSeatsTotal(code):
+    return COURSES[code]['courseSeatsTotal']
+
+def codeToSeatsFilled(code):
+    return COURSES[code]['courseSeatsFilled']
 
 
 # Check to see if theres a conflict with the code list given
 def schedule_conflict(codeList):
-    courses = [codeToCourse(code) for code in codeList]
-    length = len(courses)
+    schedules = [codeToSchedule(code) for code in codeList]
+    length = len(schedules)
     for i in range(0, length - 1):
         for j in range(i + 1, length):
-            if course_conflict(courses[i], courses[j]):
+            if course_conflict(schedules[i], schedules[j]):
                 return True
     return False
 
+
+# An ugly recursive function to construct a list of permutations from course codes
 def recurse_courses(courses, meta, building, top_level=True):
         if len(courses) == 0:
             meta.append(building)
@@ -110,12 +77,15 @@ def recurse_courses(courses, meta, building, top_level=True):
                 # Get the ball rolling
                 recurse_courses(courses[1:], meta, [section], False)
             else:
+                # Use it or use it
                 building.append(section)
                 recurse_courses(courses[1:], meta, building.copy(), False)
                 building.remove(section)
         if top_level:
             return meta
 
+
+# Top-level method for recurse-courses
 def get_all_permutations(codes):
     codes = sorted(codes, key=len)
     all_courses = recurse_courses(codes, [], [])

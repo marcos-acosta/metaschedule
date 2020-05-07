@@ -1,1 +1,2 @@
-- Delete scheduleObjects and replace them with methods in data.py
+-Replan data structures again
+-Figure out Django
