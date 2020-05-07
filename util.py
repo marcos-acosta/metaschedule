@@ -1,6 +1,6 @@
 import math
 import re
-from data import SEARCH_DICT, COURSES, course_status
+from data import SEARCH_DICT, COURSES, codeToStatus
 
 
 # Regular time to military time
@@ -46,22 +46,7 @@ def time_conflict(schedule1, schedule2):
     if (start1 < start2 and end1 > start2) or (start1 > start2 and end2 > start1) or start1 == start2:
             return True
     return False
-    
-''' MOVE THESE TO A SEPARATE UTIL FILE '''
 
-# Save json data to file
-def save_json(data, fname='data.txt'):
-    with open(fname, 'w') as outfile:
-        json.dump(data, outfile)
-
-
-# Retrieve json data from file
-def retrieve_local_data(fname='data.txt'):
-    with open(fname) as json_file:
-        data = json.load(json_file)
-    return data
-
-''' MOVE THESE TO A SEPARATE UTIL FILE '''
 
 # Combine results into different courses (not sections)
 def get_groups(results):
@@ -111,7 +96,7 @@ def check_filters(row, columns, codes):
 def filter_closed(courses):
     for sections in courses:
         for section in sections:
-            if course_status(section) == 'closed':
+            if codeToStatus(section) == 'closed':
                 sections.remove(section)
     return courses
 

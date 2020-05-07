@@ -1,5 +1,5 @@
 from util import *
-from scheduleObjects import Schedule, Collection, get_all_permutations
+from scheduling import Schedule, Collection, get_all_permutations
 from data import COURSES, refresh
 
 def testRun():

@@ -1,4 +1,4 @@
-from data import COURSES
+from data import *
 from util import *
 
 # Schedule class (helpful way of organizing the time slots of a section)
@@ -41,30 +41,28 @@ class Collection:
         return int(cumulative)
 
 
-''' Course data accessor methods '''
-
-def codeToSchedule(code):
-    return [Schedule(schedule_object) for schedule_object in COURSES[code]['courseSchedule']]
-
-def codeToCredits(code):
-    return COURSES[code]['courseCredits']
-
-def codeToSeatsTotal(code):
-    return COURSES[code]['courseSeatsTotal']
-
-def codeToSeatsFilled(code):
-    return COURSES[code]['courseSeatsFilled']
+# Convert code to schedule object
+def codeToScheduleObject(code):
+    return [Schedule(schedule_object) for schedule_object in codeToSchedule(code)]
 
 
-# Check to see if theres a conflict with the code list given
+# Check to see if there's a conflict with the code list given
 def schedule_conflict(codeList):
     schedules = [codeToSchedule(code) for code in codeList]
     length = len(schedules)
-    for i in range(0, length - 1):
+    for i in range(length - 1):
         for j in range(i + 1, length):
             if course_conflict(schedules[i], schedules[j]):
                 return True
     return False
+
+
+# Top-level method for recurse-courses
+def get_all_permutations(codes):
+    codes = sorted(codes, key=len)
+    all_courses = recurse_courses(codes, [], [])
+    all_courses = [codeList for codeList in all_courses if not schedule_conflict(codeList)]
+    return all_courses
 
 
 # An ugly recursive function to construct a list of permutations from course codes
@@ -83,11 +81,3 @@ def recurse_courses(courses, meta, building, top_level=True):
                 building.remove(section)
         if top_level:
             return meta
-
-
-# Top-level method for recurse-courses
-def get_all_permutations(codes):
-    codes = sorted(codes, key=len)
-    all_courses = recurse_courses(codes, [], [])
-    all_courses = [codeList for codeList in all_courses if not schedule_conflict(codeList)]
-    return all_courses
