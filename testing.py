@@ -35,7 +35,7 @@ def testRun():
     print('Courses okay?', check_courses(courses))
 
     # Now find all permutations
-    all_courses = get_all_permutations(courses)
+    all_courses = get_all_permutations(courses, show=True)
 
     # Number of permutations
     print('Full metaschedule length:', len(all_courses))

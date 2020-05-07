@@ -1,5 +1,6 @@
 from data import *
 from util import *
+import time
 
 # Schedule class (helpful way of organizing the time slots of a section)
 class Schedule:
@@ -48,7 +49,7 @@ def codeToScheduleObject(code):
 
 # Check to see if there's a conflict with the code list given
 def schedule_conflict(codeList):
-    schedules = [codeToSchedule(code) for code in codeList]
+    schedules = [codeToScheduleObject(code) for code in codeList]
     length = len(schedules)
     for i in range(length - 1):
         for j in range(i + 1, length):
@@ -58,10 +59,12 @@ def schedule_conflict(codeList):
 
 
 # Top-level method for recurse-courses
-def get_all_permutations(codes):
+def get_all_permutations(codes, show=False):
+    start_time = time.time()
     codes = sorted(codes, key=len)
     all_courses = recurse_courses(codes, [], [])
     all_courses = [codeList for codeList in all_courses if not schedule_conflict(codeList)]
+    print('Runtime:', len(all_courses), 'permutations in', round(time.time()-start_time, 4), 'seconds.')
     return all_courses
 
 
