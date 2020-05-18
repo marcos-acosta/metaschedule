@@ -64,7 +64,8 @@ def get_all_permutations(codes, show=False):
     codes = sorted(codes, key=len)
     all_courses = recurse_courses(codes, [], [])
     all_courses = [codeList for codeList in all_courses if not schedule_conflict(codeList)]
-    print('Runtime:', len(all_courses), 'permutations in', round(time.time()-start_time, 4), 'seconds.')
+    if show:
+        print('Runtime:', len(all_courses), 'permutations in', round(time.time()-start_time, 4), 'seconds.')
     return all_courses
 
 
