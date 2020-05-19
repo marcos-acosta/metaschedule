@@ -1,4 +1,24 @@
 {% extends 'ms/base.html' %}
 {% block content %}
-Content goes here.
+<div class="card" style="width: 68rem;">
+    <div class="card-body">
+        <form class="form-group" method="POST">
+            <div class="container">
+                <div class="row">
+                    <div class="col col-lg-10">
+                        <label for="courseSearch">Search for a course:</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-lg-10">
+                        <input type="text" class="form-control" id="courseSearch" placeholder="Course name or code">
+                    </div>
+                    <div class="col">
+                        <button type="submit" class="btn btn-outline-dark btn-block">Search</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
