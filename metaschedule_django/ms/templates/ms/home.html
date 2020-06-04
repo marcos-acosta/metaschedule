@@ -1,30 +1,41 @@
 {% extends 'ms/base.html' %}
 {% block content %}
-<div class="card" style="width: 68rem;">
-    <div class="card-body">
-        <form class="form-group" method="POST">
-            <div class="container">
-                <div class="row">
-                    <div class="col col-lg-10">
-                        <label for="courseSearch">Search for a course:</label>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col col-lg-10">
-                        <input type="text" class="form-control" id="courseSearch" placeholder="Course name or code">
-                    </div>
-                    <div class="col">
-                        <button type="submit" class="btn btn-outline-primary btn-block">Search</button>
-                    </div>
-                </div>
-            </div>
-        </form>
 
-        <form>
-            <input type="text" size="30" onkeyup="showResult(this.value)">
-            <div id="livesearch"></div>
-        </form>
-
+<div class="container text-center centered" id="toggleGroup" style="width:80vmax;">
+    <div class="btn-group btn-group-toggle mb-4" data-toggle="buttons">
+        <label class="btn btn-outline-primary active">
+            <input type="radio" id="courseSearchButton" autocomplete="off" checked> Course search
+        </label>
+        <label class="btn btn-outline-primary">
+            <input type="radio" id="schedulesButton" autocomplete="off"> Schedules
+        </label>
     </div>
 </div>
+<div class="container" id="searchContainer">
+    <div class="card" style="width: 68rem;">
+        <div class="card-body">
+            <form class="form-group" method="POST">
+                <div class="container">
+                    <div class="row">
+                        <div class="col col-lg-10">
+                            <label for="courseSearch">Search for a course:</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col col-lg-10">
+                            <input type="text" class="form-control" id="courseSearch" placeholder="Course name or code">
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-outline-primary btn-block">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="container" id="scheduleContainer" style="display:none">
+    Schedule div
+</div>
+
 {% endblock %}
