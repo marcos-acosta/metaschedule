@@ -1,5 +1,5 @@
 body {
-    background: #fafafa;
+    background: #ffffff;
     color: #333333;
     margin-top: 5rem;
 }
@@ -82,3 +82,15 @@ a.article-title:hover {
 .account-heading {
     font-size: 2.5rem;
 }
+
+input.searchBar {
+    background-image: url('searchIcon.png'); /* Add a search icon to input */
+    background-position: 10px 13px; /* Position the search icon */
+    background-repeat: no-repeat; /* Do not repeat the icon image */
+    background-size: 20px 20px;
+    width: 100%; /* Full-width */
+    font-size: 16px; /* Increase font-size */
+    padding: 12px 20px 12px 40px; /* Add some padding */
+    border: 1px solid rgb(76, 104, 226); /* Add a grey border */
+    margin-bottom: 12px; /* Add some space below the input */
+  }

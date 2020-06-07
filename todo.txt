@@ -1,1 +1,3 @@
-- tab icon
+- add loading screen until data is retrieved
+- add button to refresh (see above)
+- improve search (a lot)
