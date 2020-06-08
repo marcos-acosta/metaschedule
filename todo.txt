@@ -1,3 +1,8 @@
-- add loading screen until data is retrieved
-- add button to refresh (see above)
+TODO
+
+- group courses by stump
 - improve search (a lot)
+- add loading screen until data is retrieved
+- colors!
+- make cards smaller
+- add button to refresh (see above)

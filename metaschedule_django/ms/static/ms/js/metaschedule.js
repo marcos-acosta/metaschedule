@@ -1,6 +1,6 @@
 /* Global variables */
 var course_data;
-var selectedCourses = new Array();
+var selectedCourses = [];
 var keys;
 
 /* JQUERY */
@@ -38,6 +38,10 @@ $(document).ready(function(){
         let cards = constructCards(results, 10);
         $("#searchResults").replaceWith(cards);
     });
+    /* Add a course to your cart */
+    $("#resultsContainer").on("click", ".close", function(){
+        console.log($(this).attr("data-id"));
+    })
 });
 
 /* CodeStump object */
@@ -49,7 +53,7 @@ function CodeStump(codeStump, courses) {
 
 /* Searches array of strings for query */
 function searchStrings (query, arr) {
-    let results = new Array();
+    let results = [];
     for (let i = 0; i < arr.length; i++) {
         if (arr[i].toLowerCase().match(query)) {
             results.push(arr[i])
@@ -63,7 +67,11 @@ function constructCards(results, cap) {
     results = results.slice(0, Math.min(cap, results.length));
     let cardsHtml = '<div id="searchResults">';
     for (let i = 0; i < results.length; i++) {
-        cardsHtml += '<div class="card"><div class="card-body">' + results[i] + '</div></div>'
+        cardsHtml +=    '<div class="card"><div class="card-body">' + results[i] + ' | ' + 
+                        course_data[results[i]]['courseName'] + '<span class="text-muted ml-2">' + 
+                        course_data[results[i]]['courseCredits'] + ' credits</span>' + 
+                        '<button type="button" class="close float-right" data-id="' + results[i] + '">' + 
+                        '<span aria-hidden="true">+</span></button></div></div>';
     }
     cardsHtml += '</div>';
     return cardsHtml;
