@@ -2,6 +2,9 @@ body {
     background: #ffffff;
     color: #333333;
     margin-top: 5rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    margin-bottom: 2rem;
 }
   
 h1, h2, h3, h4, h5, h6 {
@@ -94,3 +97,19 @@ input.searchBar {
     border: 1px solid rgb(76, 104, 226); /* Add a grey border */
     margin-bottom: 12px; /* Add some space below the input */
   }
+
+.mainDiv {
+    margin-left: 0%;
+    margin-right: 0%;
+    width: 100%;
+  }
+
+.centeredDiv {
+    margin-left: 3%;
+    margin-right: 3%;
+    width: 94%;
+}
+
+.rightHandDiv {
+    min-height: 500px;
+}
