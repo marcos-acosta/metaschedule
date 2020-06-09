@@ -113,3 +113,53 @@ input.searchBar {
 .rightHandDiv {
     min-height: 500px;
 }
+
+.blueCard {
+    background-color: rgb(65, 120, 238);
+    color: white;
+}
+
+.redCard {
+    background-color: rgb(221, 143, 143);
+    color: white;
+}
+
+.greenCard {
+    background-color: rgb(150, 221, 153);
+    color: white;  
+}
+
+.yellowCard {
+    background-color: rgb(224, 205, 28);
+    color: white;  
+}
+
+.orangeCard {
+    background-color: rgb(231, 160, 28);
+    color: white;  
+}
+
+.purpleCard {
+    background-color: rgb(151, 62, 235);
+    color: white;  
+}
+
+.mintCard {
+    background-color: rgb(93, 226, 182);
+    color: white;  
+}
+
+.pinkCard {
+    background-color: rgb(209, 131, 233);
+    color: white;  
+}
+
+.aquaCard {
+    background-color: rgb(103, 214, 218);
+    color: white;  
+}
+
+.steelCard {
+    background-color: rgb(94, 114, 179);
+    color: white;  
+}
