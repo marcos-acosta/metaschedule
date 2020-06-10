@@ -33,7 +33,7 @@ $(document).ready(function(){
     });
     /* Type in search bar */
     $("#courseSearch").keyup(function(){
-        let query = $("#courseSearch").val().toLowerCase();
+        let query = cleanQuery($("#courseSearch").val().toLowerCase());
         if (query == '') {
             $("#searchResults").replaceWith('<div id="searchResults"></div>');
         } else {
@@ -70,6 +70,10 @@ function searchStrings(query, arr) {
         }
     }
     return results;
+}
+
+function cleanQuery(query) {
+    return query.replace(/[^0-9a-z]/g, '');
 }
 
 /* Constructs HTML for query cards */
