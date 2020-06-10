@@ -1,8 +1,13 @@
 /* Global variables */
 var course_data;
+var stump_data;
 var selectedCourses = [];
+// Probably will need to change this later
 var keys;
+// Won't need this later
 var stumps;
+var search_data;
+var search_data_keys;
 
 /* JQUERY */
 $(document).ready(function(){
@@ -10,8 +15,15 @@ $(document).ready(function(){
     $.getJSON('https://hyperschedule.herokuapp.com/api/v3/courses?school=hmc', function(all_data) {
         course_data = all_data['data']['courses'];
         keys = Object.keys(course_data);
-        instantiateStumps();
         console.log('Got course data');
+        instantiateStumps();
+        console.log('Instantiated naive stumps')
+        generateStumps();
+        // console.log(stump_data);
+        console.log('Instantiated better stumps')
+        generateSearches();
+        console.log('Instantiated searches')
+
     });
     /* Switch between tabs */
     $("#courseSearchButton").change(function() {
@@ -24,7 +36,7 @@ $(document).ready(function(){
     });
     /* Test button */
     $("#testButton").click(function(){
-        // console.log(cards);
+        
     });
     /* Type in search bar */
     $("#courseSearch").keyup(function(){
@@ -32,8 +44,8 @@ $(document).ready(function(){
         if (query == '') {
             $("#searchResults").replaceWith('<div id="searchResults"></div>');
         } else {
-            let results = searchStrings(query, keys);
-            let cards = constructCards(results, 10);
+            let results = searchStrings(query, search_data_keys);
+            let cards = constructSearchCards(results, 15);
             $("#searchResults").replaceWith(cards);
         }
     });
@@ -59,7 +71,7 @@ function CodeStump(codeStump, courses) {
 }
 
 /* Searches array of strings for query */
-function searchStrings (query, arr) {
+function searchStrings(query, arr) {
     let results = [];
     for (let i = 0; i < arr.length; i++) {
         if (arr[i].toLowerCase().match(query)) {
@@ -69,19 +81,19 @@ function searchStrings (query, arr) {
     return results;
 }
 
-/* Builds cards to select from list of results */
-function constructCards(results, cap) {
+function constructSearchCards(results, cap) {
     let coursesAdded = 0;
     let cardsHtml = '<div id="searchResults">';
     for (let i = 0; i < results.length; i++) {
         if (selectedCourses.includes(results[i])) {
             continue;
         }
-        cardsHtml +=    '<div class="card '+ getColor(results[i]) +' mb-1" id="' + results[i] + '" style="border-color: rgba(255, 0, 0, 0);">' + 
-                        '<div class="card-body">' + results[i] + ' | ' + course_data[results[i]]['courseName'] + ' | ' + 
-                        course_data[results[i]]['courseCredits'] + ' credits' + 
-                        '<button type="button" class="close float-right" id="addCourseButton" data-id="' + results[i] + '">' + 
-                        '<span aria-hidden="true" style="color: white;">+</span></button></div></div>';
+        let sections = search_data[results[i]];
+        cardsHtml +=    '<div class="card '+ getColor(results[i], search_data_keys) +' mb-1" id="' + results[i] + 
+                        '" style="border-color: rgba(255, 0, 0, 0);"><div class="card-body">' + results[i] + 
+                        ' | ' + sections["credits"] + 
+                        ' credits <button type="button" class="close float-right" id="addCourseButton" data-id="' + 
+                        results[i] + '"><span aria-hidden="true" style="color: white;">+</span></button></div></div>';
         coursesAdded++;
         if (coursesAdded == cap) {
             break;
@@ -94,11 +106,11 @@ function constructCards(results, cap) {
 function constructSelectedCards() {
     let cardsHtml = '<div id="courseList">';
     for (let i = 0; i < selectedCourses.length; i++) {
-        cardsHtml +=    '<div class="card mb-1" id="' + selectedCourses[i] + '"><div class="card-body">' + selectedCourses[i] + ' | ' + 
-                        course_data[selectedCourses[i]]['courseName'] + '<span class="text-muted ml-2">' + 
-                        course_data[selectedCourses[i]]['courseCredits'] + ' credits</span>' + 
-                        '<button type="button" class="close float-right" id="removeCourseButton" data-id="' + selectedCourses[i] + '">' + 
-                        '<span aria-hidden="true">&times;</span></button></div></div>';
+        let sections = search_data[selectedCourses[i]]
+        cardsHtml +=    '<div class="card ' + getColor(selectedCourses[i], search_data_keys) + ' mb-1" id="' + 
+                        selectedCourses[i] + '"><div class="card-body">' + selectedCourses[i] + ' | ' + sections["credits"] + 
+                        ' credits<button type="button" class="close float-right" id="removeCourseButton" data-id="' + 
+                        selectedCourses[i] + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
     }
     cardsHtml += '</div>';
     return cardsHtml;
@@ -122,35 +134,17 @@ function removeItemOnce(arr, value) {
 function getCreditTotal() {
     let count = 0.0;
     for (let i = 0; i < selectedCourses.length; i++) {
-        count += parseFloat(course_data[selectedCourses[i]]['courseCredits'])
+        count += parseFloat(search_data[selectedCourses[i]]["credits"]);
     }
     return count;
 }
 
-function getColor(code) {
-    let len = stumps.length;
-    let index = stumps.indexOf(stumpify(code));
-    if (index < len/10) {
-        return "redCard";
-    } else if (index < 2 * (len/10)) {
-        return "greenCard";
-    } else if (index < 3 * (len/10)) {
-        return "yellowCard";
-    } else if (index < 4 * (len/10)) {
-        return "blueCard";
-    } else if (index < 5 * (len/10)) {
-        return "orangeCard";
-    } else if (index < 6 * (len/10)) {
-        return "purpleCard";
-    } else if (index < 7 * (len/10)) {
-        return "mintCard";
-    } else if (index < 8 * (len/10)) {
-        return "pinkCard";
-    } else if (index < 9 * (len/10)) {
-        return "aquaCard";
-    } else {
-        return "steelCard";
-    }
+function getColor(code, list) {
+    let colors = ["redCard", "greenCard", "yellowCard", "blueCard", "orangeCard", "purpleCard", "mintCard", "pinkCard", "aquaCard", "steelCard"]
+    let len = list.length;
+    let index = list.indexOf(code);
+    let location = Math.trunc((index / len) * 10);
+    return colors[location];
 }
 
 function instantiateStumps() {
@@ -159,10 +153,82 @@ function instantiateStumps() {
         stumps.add(stumpify(keys[i]));
     }
     stumps = Array.from(stumps);
-    console.log(stumps);
 }
 
 function stumpify(code) {
-    let splitStr = code.split(' ');
-    return splitStr[0] + ' ' + splitStr[1];
+    return code.split('-')[0];
 }
+
+function generateStumps() {
+    stump_data = {};
+    for (let i = 0; i < keys.length; i++) {
+        let stump = stumpify(keys[i]);
+        // Already have this stump
+        if (stump_data.hasOwnProperty(stump)) {
+            // Just add this section
+            stump_data[stump]["sections"].push(keys[i]);
+        } else {
+            // Instantiate it!
+            stump_data[stump] = {
+                sections: [keys[i]]
+            };
+        }
+    }
+}
+
+function generateSearches() {
+    search_data = {};
+    stump_keys = Object.keys(stump_data)
+    for (let i = 0; i < stump_keys.length; i++) {
+        let course = course_data[stump_data[stump_keys[i]]["sections"][0]];
+        search_data[stump_keys[i] + ' ' + course['courseName']] = {
+            "stump": stump_keys[i],
+            "credits": course['courseCredits']
+        }
+    }
+    search_data_keys = Object.keys(search_data);
+}
+
+/*
+function getCreditTotal_old() {
+    let count = 0.0;
+    for (let i = 0; i < selectedCourses.length; i++) {
+        count += parseFloat(course_data[selectedCourses[i]]['courseCredits']);
+    }
+    return count;
+}
+
+function constructSelectedCards_old() {
+    let cardsHtml = '<div id="courseList">';
+    for (let i = 0; i < selectedCourses.length; i++) {
+        cardsHtml +=    '<div class="card mb-1" id="' + selectedCourses[i] + '"><div class="card-body">' + selectedCourses[i] + ' | ' + 
+                        course_data[selectedCourses[i]]['courseName'] + '<span class="text-muted ml-2">' + 
+                        course_data[selectedCourses[i]]['courseCredits'] + ' credits</span>' + 
+                        '<button type="button" class="close float-right" id="removeCourseButton" data-id="' + selectedCourses[i] + '">' + 
+                        '<span aria-hidden="true">&times;</span></button></div></div>';
+    }
+    cardsHtml += '</div>';
+    return cardsHtml;
+}
+
+function constructCards_old(results, cap) {
+    let coursesAdded = 0;
+    let cardsHtml = '<div id="searchResults">';
+    for (let i = 0; i < results.length; i++) {
+        if (selectedCourses.includes(results[i])) {
+            continue;
+        }
+        cardsHtml +=    '<div class="card '+ getColor(stumpify(results[i]), stumps) +' mb-1" id="' + results[i] + '" style="border-color: rgba(255, 0, 0, 0);">' + 
+                        '<div class="card-body">' + results[i] + ' | ' + course_data[results[i]]['courseName'] + ' | ' + 
+                        course_data[results[i]]['courseCredits'] + ' credits' + 
+                        '<button type="button" class="close float-right" id="addCourseButton" data-id="' + results[i] + '">' + 
+                        '<span aria-hidden="true" style="color: white;">+</span></button></div></div>';
+        coursesAdded++;
+        if (coursesAdded == cap) {
+            break;
+        }
+    }
+    cardsHtml += '</div>';
+    return cardsHtml;
+}
+*/

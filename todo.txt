@@ -1,7 +1,6 @@
 TODO
 
-- group courses by stump
-- improve search (a lot)
+- improve search with search score
 - add loading screen until data is retrieved
 - add button to refresh (see above)
 - make cards smaller
