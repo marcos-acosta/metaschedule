@@ -1,6 +1,6 @@
 TODO
 
-- improve search with search score
+- get info when clicking on card
 - add loading screen until data is retrieved
 - add button to refresh (see above)
 - make cards smaller

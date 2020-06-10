@@ -73,8 +73,13 @@ function CodeStump(codeStump, courses) {
 /* Searches array of strings for query */
 function searchStrings(query, arr) {
     let results = [];
+    let words = query.split(' ');
+    let reSearch = '';
+    for (let i = 0; i < words.length; i++) {
+        reSearch += '(?=.*' + words[i] + ')';
+    }
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i].toLowerCase().match(query)) {
+        if (arr[i].toLowerCase().match(reSearch)) {
             results.push(arr[i])
         }
     }
