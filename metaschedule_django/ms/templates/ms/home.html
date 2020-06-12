@@ -34,21 +34,35 @@
             </div>      
         </div>
         <div class="col-sm rightHandDiv" id="rightSide">
-            <div class="card" style="min-height: 500px;">
-                <div class="card-header">
-                    Your courses
-                </div>
-                <div class="card-body">
-                    <p class="card-text" id="coursesP">
-                        <div id="courseList">
-
+            <div class="row">
+                <div class="card mb-3" id ="mainSelectedCoursesCard" style="height: 200px; width: 100%;">
+                    <div class="card-header">
+                        Course info
+                    </div>
+                    <div class="scrollDiv" style="height: 150px;" id="infoContainer">
+                        <div id="courseInfo">
+                            
                         </div>
-                    </p>
+                    </div>
                 </div>
-                <div class="card-footer">
-                    <span class="text-muted">Total credits: <span id="creditCount">0.0</span> credits</span>
+            </div>
+            <div class="row">
+                <div class="card" id = "mainSelectedCoursesCard" style="min-height: 500px; width: 100%;">
+                    <div class="card-header">
+                        Your courses
+                    </div>
+                    <div class="card-body">
+                        <div class="card-text" id="selectedContainer">
+                            <div id="courseList">
+    
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="text-muted">Total credits: <span id="creditCount">0.0</span> credits</span>
+                    </div>
                 </div>
-              </div>
+            </div>
         </div>
     </div>
 </div>

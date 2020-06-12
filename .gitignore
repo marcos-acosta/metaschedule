@@ -3,3 +3,4 @@ venv/
 .DS_Store
 data.txt
 __pycache__/
+not_relevant.py

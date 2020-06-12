@@ -159,7 +159,14 @@ input.searchBar {
     color: white;  
 }
 
-.steelCard {
+.cobaltCard {
     background-color: rgb(94, 114, 179);
     color: white;  
 }
+
+.scrollDiv {
+    overflow-y: scroll;
+    padding: 10px;
+    border-style: dotted;
+    border-color: rgb(219, 219, 219);
+  }
