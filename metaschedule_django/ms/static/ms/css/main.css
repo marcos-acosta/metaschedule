@@ -164,9 +164,22 @@ input.searchBar {
     color: white;  
 }
 
+.grayCard {
+    background-color: #bbbbbb;
+    color: rgb(51, 51, 51);
+}
+
 .scrollDiv {
     overflow-y: scroll;
     padding: 10px;
     border-style: dotted;
     border-color: rgb(219, 219, 219);
   }
+
+.specialCircle {
+    height: 24px;
+    width: 24px;
+    background-color: #555;
+    border-radius: 25%;
+    border: 2px solid darkgray;
+}

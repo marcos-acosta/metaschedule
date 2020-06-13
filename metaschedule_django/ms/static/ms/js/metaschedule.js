@@ -43,8 +43,8 @@ $(document).ready(function(){
         }
     });
     $("#resultsContainer, #selectedContainer").on("click", ".card", function(){
-        stump = nameToStump($(this).attr("data-id"));
-        let info = constructCourseData(stump);
+        let name = $(this).attr("data-id");
+        let info = constructCourseData(name);
         $("#courseInfo").replaceWith(info);
     });
     /* Add a course to your cart */
@@ -80,7 +80,7 @@ function searchStrings(query, arr) {
 }
 
 function cleanQuery(query) {
-    return query.replace(/[^0-9a-z]/g, '');
+    return query.replace(/[^0-9a-z\s\"]/g, '');
 }
 
 /* Constructs HTML for query cards */
@@ -94,14 +94,14 @@ function constructSearchCards(results, cap) {
         let seats = getSeatsFilled(nameToStump(results[i]));
         let color = "";
         if (seats[0] >= seats[1]) {
-            color = "bg-secondary";
+            color = "grayCard";
         } else {
             color = getColor(results[i], search_data_keys);
         }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
-                        '" id="addCard" style="border-color: rgba(255, 0, 0, 0);"><div class="card-body">' + results[i] + ' ' +
-                        formattedSeats + '<button type="button" class="close float-right" id="addCourseButton" data-id="' + 
+                        '" id="addCard" style="border-color: rgba(255, 0, 0, 0); height:42px;"><div class="card-body p-2 ml-2">' + 
+                        results[i] + ' ' + formattedSeats + '<button type="button" class="close float-right" id="addCourseButton" data-id="' + 
                         results[i] + '"><span aria-hidden="true" style="color: white;">+</span></button></div></div>';
         coursesAdded++;
         if (coursesAdded == cap) {
@@ -119,7 +119,7 @@ function constructSelectedCards() {
         let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
         let color = "";
         if (seats[0] >= seats[1]) {
-            color = "bg-secondary";
+            color = "grayCard";
         } else {
             color = getColor(selectedCourses[i], search_data_keys);
         }
@@ -133,9 +133,25 @@ function constructSelectedCards() {
     return cardsHtml;
 }
 
-function constructCourseData(stump) {
+function constructCourseData(name) {
+    let stump = nameToStump(name);
+    let sections = stump_data[stump]["sections"];
+    let credits = course_data[sections[0]]['courseCredits'];
+    let description = '<b>(' + credits + ' credits) </b>' + course_data[sections[0]]['courseDescription'];
+    if (description == null) {
+        description = "No course description";
+    }
     let infoHtml = '<div id="courseInfo">';
-    infoHtml += stump_data[stump]["sections"];
+    infoHtml += '<h5>' + name + '</h5><hr><span style="font-size: 14px;">';
+    infoHtml += description;
+    infoHtml += '</span><hr><h5>Sections</h5><p>';
+    for (let i = 0; i < sections.length; i++) {
+        let seats = getSectionSeatsFilled(sections[i]);
+        let color = getColorFromSeats(seats);
+        infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + ';"><div class="card-header p-2">' + sections[i] + ' (' + 
+                    seats[0] + '/' + seats[1] + ')<div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2">' + 
+                    formatProfs(sections[i]) + '</div></div>'
+    }
     infoHtml += '</div>';
     return infoHtml;
 }
@@ -226,4 +242,35 @@ function getSeatsFilled(stump) {
         seatsTotal += course_data[sections[i]]["courseSeatsTotal"];
     }
     return [seatsFilled, seatsTotal];
+}
+
+function getSectionSeatsFilled(code) {
+    let course = course_data[code];
+    return [course['courseSeatsFilled'], course['courseSeatsTotal']];
+}
+
+function getColorFromSeats(seats) {
+    let percent = seats[0] / seats[1];
+    let colors = ['rgb(173, 52, 12)', 'rgb(207, 138, 19)', 'rgb(255, 246, 82)', 'rgb(128, 204, 29)'];
+    let h = (100 - Math.round(percent * 100))/100;
+    if (h < 0) { h = 0; }
+    if (h == 1) { h = 0.99; }
+    return colors[Math.floor(h * 4)];
+}
+
+function formatProfs(code) {
+    let profs = course_data[code]['courseInstructors'];
+    if (profs.length == 0) {
+        return 'No professor data';
+    } else if (profs.length == 1) {
+        return 'Taught by ' + profs[0];
+    } else if (profs.length == 2) {
+        return 'Taught by ' + profs[0] + ' and ' + profs[1];
+    } else {
+        let string = 'Taught by ';
+        for (let i = 0; i < profs.length-1; i++) {
+            string += profs[i] + ', '
+        }
+        return string + 'and ' + profs[profs.length - 1];
+    }
 }

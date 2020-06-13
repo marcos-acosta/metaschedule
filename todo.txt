@@ -1,7 +1,7 @@
 TODO
 
-- get info when clicking on card
 - add loading screen until data is retrieved
 - add button to refresh (see above)
-- make cards smaller
 - goddamn quotation marks in courses, why the fuck do they let you do that
+- make colors more varied
+- make right stuff sidebar?
