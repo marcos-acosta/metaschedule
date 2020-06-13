@@ -96,7 +96,20 @@ input.searchBar {
     padding: 12px 20px 12px 40px; /* Add some padding */
     border: 1px solid rgb(76, 104, 226); /* Add a grey border */
     margin-bottom: 12px; /* Add some space below the input */
-  }
+}
+
+input.searchBar:disabled {
+    background-image: url('searchIcon.png'); /* Add a search icon to input */
+    background-position: 10px 13px; /* Position the search icon */
+    background-repeat: no-repeat; /* Do not repeat the icon image */
+    background-size: 20px 20px;
+    background-color: #f5f1f1;
+    width: 100%; /* Full-width */
+    font-size: 16px; /* Increase font-size */
+    padding: 12px 20px 12px 40px; /* Add some padding */
+    border: 1px solid rgb(82, 82, 82); /* Add a grey border */
+    margin-bottom: 12px; /* Add some space below the input */
+}
 
 .mainDiv {
     margin-left: 0%;
@@ -162,6 +175,21 @@ input.searchBar {
 .cobaltCard {
     background-color: rgb(94, 114, 179);
     color: white;  
+}
+
+.limeCard {
+    background-color: #8aeb3c;
+    color: white;
+}
+
+.strongPinkCard {
+    background-color: #e04660;
+    color: white;
+}
+
+.dreamPurpleCard {
+    background-color: #9546e0;
+    color: white;
 }
 
 .grayCard {

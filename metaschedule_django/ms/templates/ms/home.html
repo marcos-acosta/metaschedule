@@ -1,12 +1,14 @@
 {% extends 'ms/base.html' %}
 {% block content %}
-
-<div class="container text-center centered" id="toggleGroup" style="width:100vmax;">
+<div class="btn btn-primary float-right" id="refresh">
+    Refresh
+</div>
+<div class="container text-center centered" id="toggleGroup" style="width:100vmax;">  
     <div class="btn-group btn-group-toggle mb-4" data-toggle="buttons">
-        <label class="btn btn-outline-secondary active">
+        <label class="btn btn-outline-primary active">
             <input type="radio" id="courseSearchButton" autocomplete="off" checked> Course search
         </label>
-        <label class="btn btn-outline-secondary">
+        <label class="btn btn-outline-primary">
             <input type="radio" id="schedulesButton" autocomplete="off"> Schedules
         </label>
     </div>
@@ -17,11 +19,12 @@
             <div class="card" style="width: 50rem;">
                 <div class="card-header">
                     Search for a course:
+                    <div class="spinner-border text-primary float-right" style="width: 23px; height: 23px" role="status" id="loadingSpinner"></div>
                 </div>
                 <div class="card-body">
-                    <form class="form-group" method="POST">
+                    <form class="form-group">
                         <div class="container">
-                            <input type="text" class="searchBar" id="courseSearch" placeholder="Course name or code"> 
+                            <input type="text" class="searchBar" id="courseSearch" placeholder="Course name or code" disabled> 
                         </div>
                     </form>
                 </div>

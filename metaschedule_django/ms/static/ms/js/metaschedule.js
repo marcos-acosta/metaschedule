@@ -10,13 +10,9 @@ var search_data_keys;
 $(document).ready(function(){
     /* Get course data */
     $.getJSON('https://hyperschedule.herokuapp.com/api/v3/courses?school=hmc', function(all_data) {
-        course_data = all_data['data']['courses'];
-        course_keys = Object.keys(course_data);
-        console.log('Got course data');
-        generateStumps();
-        console.log('Instantiated stump data')
-        generateSearches();
-        console.log('Instantiated searches')
+        collectData(all_data);
+        $('#courseSearch').prop("disabled", false);
+        $('#loadingSpinner').hide();
     });
     /* Switch between tabs */
     $("#courseSearchButton").change(function() {
@@ -27,10 +23,9 @@ $(document).ready(function(){
         $("#searchContainer").hide();
         $("#scheduleContainer").show();
     });
-    /* Test button */
-    $("#testButton").click(function(){
-        
-    });
+    $("#testButton").click(function() {
+        $('#exampleModal').modal('toggle');
+    })
     /* Type in search bar */
     $("#courseSearch").keyup(function(){
         let query = cleanQuery($("#courseSearch").val().toLowerCase());
@@ -61,7 +56,30 @@ $(document).ready(function(){
         removeItemOnce(selectedCourses, code);
         updateCourseList();
     });
+    $("#refresh").click(function() {
+        $('#courseSearch').prop("disabled", true);
+        $('#loadingSpinner').show();
+        $.getJSON('https://hyperschedule.herokuapp.com/api/v3/courses?school=hmc', function(all_data) {
+            collectData(all_data);
+            $('#courseSearch').prop("disabled", false);
+            $('#loadingSpinner').hide();
+        });
+        updateCourseList();
+        $("#courseInfo").replaceWith('<div id="courseInfo"></div>');
+    });
 });
+
+function collectData(all_data) {
+    course_data = all_data['data']['courses'];
+    course_keys = Object.keys(course_data);
+    console.log('Got course data');
+    generateStumps();
+    console.log('Instantiated stump data');
+    generateSearches();
+    console.log('Instantiated searches');
+    $('#courseSearch').prop("disabled", false);
+    $('#loadingSpinner').hide();
+}
 
 /* Searches array of strings for query */
 function searchStrings(query, arr) {
@@ -80,7 +98,7 @@ function searchStrings(query, arr) {
 }
 
 function cleanQuery(query) {
-    return query.replace(/[^0-9a-z\s\"]/g, '');
+    return query.replace(/[^0-9a-z\s\"\']/g, '');
 }
 
 /* Constructs HTML for query cards */
@@ -96,7 +114,7 @@ function constructSearchCards(results, cap) {
         if (seats[0] >= seats[1]) {
             color = "grayCard";
         } else {
-            color = getColor(results[i], search_data_keys);
+            color = getColor(results[i]);
         }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
@@ -121,7 +139,7 @@ function constructSelectedCards() {
         if (seats[0] >= seats[1]) {
             color = "grayCard";
         } else {
-            color = getColor(selectedCourses[i], search_data_keys);
+            color = getColor(selectedCourses[i]);
         }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + 
@@ -137,9 +155,11 @@ function constructCourseData(name) {
     let stump = nameToStump(name);
     let sections = stump_data[stump]["sections"];
     let credits = course_data[sections[0]]['courseCredits'];
-    let description = '<b>(' + credits + ' credits) </b>' + course_data[sections[0]]['courseDescription'];
-    if (description == null) {
+    let description;
+    if (course_data[sections[0]]['courseDescription'] == null) {
         description = "No course description";
+    } else {
+        description = '<b>(' + credits + ' credits) </b>' + course_data[sections[0]]['courseDescription'];
     }
     let infoHtml = '<div id="courseInfo">';
     infoHtml += '<h5>' + name + '</h5><hr><span style="font-size: 14px;">';
@@ -148,7 +168,7 @@ function constructCourseData(name) {
     for (let i = 0; i < sections.length; i++) {
         let seats = getSectionSeatsFilled(sections[i]);
         let color = getColorFromSeats(seats);
-        infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + ';"><div class="card-header p-2">' + sections[i] + ' (' + 
+        infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + '; border-width: 2px;"><div class="card-header p-2">' + sections[i] + ' (' + 
                     seats[0] + '/' + seats[1] + ')<div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2">' + 
                     formatProfs(sections[i]) + '</div></div>'
     }
@@ -182,12 +202,9 @@ function getCreditTotal() {
     return count;
 }
 
-/* Get CSS color of a course */
-function getColor(code, list) {
-    let colors = ["redCard", "greenCard", "yellowCard", "blueCard", "orangeCard", "purpleCard", "mintCard", "pinkCard", "aquaCard", "cobaltCard"]
-    let len = list.length;
-    let index = list.indexOf(code);
-    let location = Math.trunc((index / len) * 10);
+function getColor(code) {
+    let colors = ["redCard", "greenCard", "yellowCard", "blueCard", "orangeCard", "purpleCard", "mintCard", "pinkCard", "aquaCard", "cobaltCard", "limeCard", "strongPinkCard", "dreamPurpleCard"];
+    let location = Math.trunc((code.toLowerCase().charCodeAt(0) + code.toLowerCase().charCodeAt(1)) % 13);
     return colors[location];
 }
 
