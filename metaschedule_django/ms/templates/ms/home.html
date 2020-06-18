@@ -13,32 +13,43 @@
         </label>
     </div>
 </div>
-<div class="div centeredDiv" id="searchContainer">
+<div class="div centeredDiv" id="leftSide">
     <div class="row">
-        <div class="col-sm" id="leftSide">
-            <div class="card" style="width: 50rem;">
-                <div class="card-header">
-                    Search for a course:
-                    <div class="spinner-border text-primary float-right" style="width: 23px; height: 23px" role="status" id="loadingSpinner"></div>
+        <div class="col-sm">
+            <div id="searchContainer">
+                <div class="card" style="width: 50rem;">
+                    <div class="card-header">
+                        Search for a course:
+                        <div class="spinner-border text-primary float-right" style="width: 23px; height: 23px" role="status" id="loadingSpinner"></div>
+                    </div>
+                    <div class="card-body">
+                        <form class="form-group">
+                            <div class="container">
+                                <input type="text" class="searchBar" id="courseSearch" placeholder="Course name or code" disabled> 
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form class="form-group">
-                        <div class="container">
-                            <input type="text" class="searchBar" id="courseSearch" placeholder="Course name or code" disabled> 
-                        </div>
-                    </form>
+                <br>
+                <!-- <button class="btn btn-outline-secondary" id="testButton">Test</button> -->
+                <div id="resultsContainer">
+                    <div id="searchResults">
+                    </div>
                 </div>
+            </div>   
+            <div id="scheduleContainer" style="display: none;">
+                <div class="card" style="min-height: 300px; width: 50rem;">
+                    <div class="card-header">
+                        Filters
+                    </div>
+                    <div class="card-body" id="filterContainer">
+                    </div>
+                </div>   
             </div>
-            <br>
-            <!-- <button class="btn btn-outline-secondary" id="testButton">Test</button> -->
-            <div id="resultsContainer">
-                <div id="searchResults">
-                </div>
-            </div>      
         </div>
         <div class="col-sm rightHandDiv" id="rightSide">
             <div class="row">
-                <div class="card mb-3" id ="mainSelectedCoursesCard" style="height: 350px; width: 100%;">
+                <div class="card mb-3" id ="courseInfoCard" style="height: 350px; width: 490px;">
                     <div class="card-header">
                         Course info
                     </div>
@@ -50,7 +61,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="card" id = "mainSelectedCoursesCard" style="min-height: 500px; width: 100%;">
+                <div class="card" id="mainSelectedCoursesCard" style="min-height: 500px; width: 100%;">
                     <div class="card-header">
                         Your courses
                     </div>
@@ -69,15 +80,14 @@
         </div>
     </div>
 </div>
-<div class="div centeredDiv" id="scheduleContainer">
-    <!-- <button class="btn btn-primary" id="filterTest">Test</button> -->
-    <div class="card" style="width: 60%;">
+<!-- <div class="div centeredDiv" id="scheduleContainer" style="display: none;">
+    <div class="card" style="width: 60%; min-height: 300px;">
         <div class="card-header">
             Filters
         </div>
         <div class="card-body" id="filterContainer">
         </div>
     </div>
-</div>
+</div> -->
 
 {% endblock %}

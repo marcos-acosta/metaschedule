@@ -6,6 +6,7 @@ var course_keys;
 var search_data;
 var search_data_keys;
 var filters;
+var pending_course;
 
 /* JQUERY */
 $(document).ready(function(){
@@ -19,14 +20,13 @@ $(document).ready(function(){
     $("#courseSearchButton").change(function() {
         $("#searchContainer").show();
         $("#scheduleContainer").hide();
+        $("#mainSelectedCoursesCard").show();
     });
     $("#schedulesButton").change(function() {
         $("#searchContainer").hide();
         $("#scheduleContainer").show();
+        $("#mainSelectedCoursesCard").hide();
     });
-    $("#testButton").click(function() {
-        $('#exampleModal').modal('toggle');
-    })
     /* Type in search bar */
     $("#courseSearch").keyup(function(){
         let query = cleanQuery($("#courseSearch").val().toLowerCase());
@@ -38,7 +38,7 @@ $(document).ready(function(){
             $("#searchResults").replaceWith(cards);
         }
     });
-    $("#resultsContainer, #selectedContainer").on("click", ".card", function(){
+    $("#resultsContainer, #selectedContainer, #filterContainer").on("click", ".card", function(){
         let name = $(this).attr("data-id");
         let info = constructCourseData(name);
         $("#courseInfo").replaceWith(info);
@@ -47,9 +47,13 @@ $(document).ready(function(){
     $("#resultsContainer").on("click", "#addCourseButton", function(e){
         e.stopPropagation();
         let code = $(this).attr("data-id");
-        selectedCourses.push(code);
-        updateCourseList();
-        updateScheduleDiv();
+        let seats = getSeatsFilled(nameToStump(code));
+        if (seats[2] == false) {
+            pending_course = code;
+            $("#fullModal").modal('show');
+        } else {
+            addCourse(code);
+        }
     });
     /* Remove a course from your cart */
     $("#selectedContainer").on("click", "#removeCourseButton", function(e){
@@ -73,10 +77,16 @@ $(document).ready(function(){
     $("#sectionPicker").on("change", function() {
         console.log($(this).val());
     });
-    $("#filterTest").click(function() {
-        addFilterPickers();
+    $("#addAnyway").click(function() {
+        addCourse(pending_course);
     });
 });
+
+function addCourse(code) {
+    selectedCourses.push(code);
+    updateCourseList();
+    updateScheduleDiv();
+}
 
 function collectData(all_data) {
     course_data = all_data['data']['courses'];
@@ -184,7 +194,7 @@ function updateCourseList() {
 function getFilterHtml(i) {
     let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
     let color = getColorOrGray(selectedCourses[i], seats);
-    let html = '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + selectedCourses[i] + '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" data-id="' + i + '">';
+    let html = '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);" data-id="' + selectedCourses[i] + '"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + selectedCourses[i] + '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" data-id="' + i + '">';
     let sections = stump_data[nameToStump(selectedCourses[i])]['sections'];
     sections.forEach(function(section) {
         html += '<option>' + section + '</option>';
@@ -229,7 +239,7 @@ function getColor(name) {
 }
 
 function getColorOrGray(name, seats) {
-    if (seats[0] >= seats[1]) {
+    if (seats[2] == false) {
         return "grayCard";
     } else {
         return getColor(name);
@@ -282,11 +292,15 @@ function getSeatsFilled(stump) {
     let sections = stump_data[stump]["sections"];
     let seatsFilled = 0;
     let seatsTotal = 0;
+    let anyAvailable = false;
     for (let i = 0; i < sections.length; i++) {
         seatsFilled += course_data[sections[i]]["courseSeatsFilled"];
         seatsTotal += course_data[sections[i]]["courseSeatsTotal"];
+        if (seatsFilled < seatsTotal) {
+            anyAvailable = true;
+        }
     }
-    return [seatsFilled, seatsTotal];
+    return [seatsFilled, seatsTotal, anyAvailable];
 }
 
 function getSectionSeatsFilled(code) {
