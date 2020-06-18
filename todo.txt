@@ -1,1 +1,7 @@
 TODO
+
+- don't reset dropdowns that were already there
+- look over code to make sure refreshing refreshes active course data
+- add spinner to refresh button
+- generate results button that reactivates when you change filters
+- fix quotation marks in title

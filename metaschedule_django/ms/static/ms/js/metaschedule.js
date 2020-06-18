@@ -5,6 +5,7 @@ var selectedCourses = [];
 var course_keys;
 var search_data;
 var search_data_keys;
+var filters;
 
 /* JQUERY */
 $(document).ready(function(){
@@ -48,6 +49,7 @@ $(document).ready(function(){
         let code = $(this).attr("data-id");
         selectedCourses.push(code);
         updateCourseList();
+        updateScheduleDiv();
     });
     /* Remove a course from your cart */
     $("#selectedContainer").on("click", "#removeCourseButton", function(e){
@@ -55,6 +57,7 @@ $(document).ready(function(){
         let code = $(this).attr("data-id");
         removeItemOnce(selectedCourses, code);
         updateCourseList();
+        updateScheduleDiv();
     });
     $("#refresh").click(function() {
         $('#courseSearch').prop("disabled", true);
@@ -66,6 +69,12 @@ $(document).ready(function(){
         });
         updateCourseList();
         $("#courseInfo").replaceWith('<div id="courseInfo"></div>');
+    });
+    $("#sectionPicker").on("change", function() {
+        console.log($(this).val());
+    });
+    $("#filterTest").click(function() {
+        addFilterPickers();
     });
 });
 
@@ -110,12 +119,7 @@ function constructSearchCards(results, cap) {
             continue;
         }
         let seats = getSeatsFilled(nameToStump(results[i]));
-        let color = "";
-        if (seats[0] >= seats[1]) {
-            color = "grayCard";
-        } else {
-            color = getColor(results[i]);
-        }
+        let color = getColorOrGray(results[i], seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
                         '" id="addCard" style="border-color: rgba(255, 0, 0, 0); height:42px;"><div class="card-body p-2 ml-2">' + 
@@ -135,20 +139,14 @@ function constructSelectedCards() {
     let cardsHtml = '<div id="courseList">';
     for (let i = 0; i < selectedCourses.length; i++) {
         let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
-        let color = "";
-        if (seats[0] >= seats[1]) {
-            color = "grayCard";
-        } else {
-            color = getColor(selectedCourses[i]);
-        }
+        let color = getColorOrGray(selectedCourses[i], seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + 
                         selectedCourses[i] + '" id="removeCard" style="border-color: rgba(255, 0, 0, 0);"><div class="card-body">' + selectedCourses[i] + ' ' + 
                         formattedSeats + '<button type="button" class="close float-right" id="removeCourseButton" data-id="' + 
                         selectedCourses[i] + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
     }
-    cardsHtml += '</div>';
-    return cardsHtml;
+    return cardsHtml + '</div>';
 }
 
 function constructCourseData(name) {
@@ -164,7 +162,7 @@ function constructCourseData(name) {
     let infoHtml = '<div id="courseInfo">';
     infoHtml += '<h5>' + name + '</h5><hr><span style="font-size: 14px;">';
     infoHtml += description;
-    infoHtml += '</span><hr><h5>Sections</h5><p>';
+    infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
     for (let i = 0; i < sections.length; i++) {
         let seats = getSectionSeatsFilled(sections[i]);
         let color = getColorFromSeats(seats);
@@ -172,8 +170,7 @@ function constructCourseData(name) {
                     seats[0] + '/' + seats[1] + ')<div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2">' + 
                     formatProfs(sections[i]) + '</div></div>'
     }
-    infoHtml += '</div>';
-    return infoHtml;
+    return infoHtml + '</div>';
 }
 
 /* Update course list */
@@ -182,6 +179,29 @@ function updateCourseList() {
     let cards = constructSelectedCards();
     $("#courseList").replaceWith(cards);
     $("#creditCount").replaceWith('<span id="creditCount">' + getCreditTotal() + '</span>');
+}
+
+function getFilterHtml(i) {
+    let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
+    let color = getColorOrGray(selectedCourses[i], seats);
+    let html = '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + selectedCourses[i] + '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" data-id="' + i + '">';
+    let sections = stump_data[nameToStump(selectedCourses[i])]['sections'];
+    sections.forEach(function(section) {
+        html += '<option>' + section + '</option>';
+    });
+    return html + '</select></div></div>';
+}
+
+function updateScheduleDiv() {
+    let html = '';
+    for (let i = 0; i < selectedCourses.length; i++) {
+        // html += '<select class="selectpicker" id="sectionPicker" data-id="' + i + '"><option>Test</option></select>'
+        html += getFilterHtml(i);
+    }
+    $("#filterContainer").html(html);
+    for (let i = 0; i < selectedCourses.length; i++) {
+        $("[id='sectionPicker'][data-id='" + i + "']").selectpicker('refresh');
+    }
 }
 
 /* Remove item from array */
@@ -202,10 +222,18 @@ function getCreditTotal() {
     return count;
 }
 
-function getColor(code) {
+function getColor(name) {
     let colors = ["redCard", "greenCard", "yellowCard", "blueCard", "orangeCard", "purpleCard", "mintCard", "pinkCard", "aquaCard", "cobaltCard", "limeCard", "strongPinkCard", "dreamPurpleCard"];
-    let location = Math.trunc((code.toLowerCase().charCodeAt(0) + code.toLowerCase().charCodeAt(1)) % 13);
+    let location = Math.trunc((name.toLowerCase().charCodeAt(0) + name.toLowerCase().charCodeAt(1)) % 13);
     return colors[location];
+}
+
+function getColorOrGray(name, seats) {
+    if (seats[0] >= seats[1]) {
+        return "grayCard";
+    } else {
+        return getColor(name);
+    }
 }
 
 /* Cut a code down to a stump */
