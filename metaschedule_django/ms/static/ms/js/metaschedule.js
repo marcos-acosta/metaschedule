@@ -19,13 +19,15 @@ $(document).ready(function(){
     /* Switch between tabs */
     $("#courseSearchButton").change(function() {
         $("#searchContainer").show();
-        $("#scheduleContainer").hide();
         $("#mainSelectedCoursesCard").show();
+        $("#scheduleContainer").hide();
+        $("#actualScheduleContainer").hide();
     });
     $("#schedulesButton").change(function() {
         $("#searchContainer").hide();
-        $("#scheduleContainer").show();
         $("#mainSelectedCoursesCard").hide();
+        $("#scheduleContainer").show();
+        $("#actualScheduleContainer").show();
     });
     /* Type in search bar */
     $("#courseSearch").keyup(function(){
@@ -80,6 +82,9 @@ $(document).ready(function(){
     $("#addAnyway").click(function() {
         addCourse(pending_course);
     });
+    $("#filterInfoButton").click(function() {
+        $("#filterInfoModal").modal('show');
+    });
 });
 
 function addCourse(code) {
@@ -97,7 +102,6 @@ function collectData(all_data) {
     generateSearches();
     console.log('Instantiated searches');
     $('#courseSearch').prop("disabled", false);
-    $('#loadingSpinner').hide();
 }
 
 /* Searches array of strings for query */
@@ -132,7 +136,7 @@ function constructSearchCards(results, cap) {
         let color = getColorOrGray(results[i], seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
-                        '" id="addCard" style="border-color: rgba(255, 0, 0, 0); height:42px;"><div class="card-body p-2 ml-2">' + 
+                        '" id="addCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
                         results[i] + ' ' + formattedSeats + '<button type="button" class="close float-right" id="addCourseButton" data-id="' + 
                         results[i] + '"><span aria-hidden="true" style="color: white;">+</span></button></div></div>';
         coursesAdded++;
@@ -152,7 +156,7 @@ function constructSelectedCards() {
         let color = getColorOrGray(selectedCourses[i], seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + 
-                        selectedCourses[i] + '" id="removeCard" style="border-color: rgba(255, 0, 0, 0);"><div class="card-body">' + selectedCourses[i] + ' ' + 
+                        selectedCourses[i] + '" id="removeCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer;"><div class="card-body">' + selectedCourses[i] + ' ' + 
                         formattedSeats + '<button type="button" class="close float-right" id="removeCourseButton" data-id="' + 
                         selectedCourses[i] + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
     }
@@ -194,7 +198,9 @@ function updateCourseList() {
 function getFilterHtml(i) {
     let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
     let color = getColorOrGray(selectedCourses[i], seats);
-    let html = '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);" data-id="' + selectedCourses[i] + '"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + selectedCourses[i] + '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" data-id="' + i + '">';
+    let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0); cursor: pointer;" data-id="' + 
+                selectedCourses[i] + '"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + selectedCourses[i] + 
+                '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
     let sections = stump_data[nameToStump(selectedCourses[i])]['sections'];
     sections.forEach(function(section) {
         html += '<option>' + section + '</option>';
@@ -309,6 +315,9 @@ function getSectionSeatsFilled(code) {
 }
 
 function getColorFromSeats(seats) {
+    if (seats[0] >= seats[1]) {
+        return 'rgb(187, 187, 187)';
+    }
     let percent = seats[0] / seats[1];
     let colors = ['rgb(173, 52, 12)', 'rgb(207, 138, 19)', 'rgb(255, 246, 82)', 'rgb(128, 204, 29)'];
     let h = (100 - Math.round(percent * 100))/100;

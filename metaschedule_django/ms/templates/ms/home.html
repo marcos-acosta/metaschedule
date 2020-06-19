@@ -14,7 +14,7 @@
     </div>
 </div>
 <div class="div centeredDiv" id="leftSide">
-    <div class="row">
+    <div class="row" style="height: 360px;">
         <div class="col-sm">
             <div id="searchContainer">
                 <div class="card" style="width: 50rem;">
@@ -38,11 +38,12 @@
                 </div>
             </div>   
             <div id="scheduleContainer" style="display: none;">
-                <div class="card" style="min-height: 300px; width: 50rem;">
+                <div class="card" style="height: 350px; width: 50rem;">
                     <div class="card-header">
                         Filters
+                        <button id="filterInfoButton" class="btn btn-outline-secondary float-right mr-1 p-0" style="height: 25px; width: 25px;">?</button>
                     </div>
-                    <div class="card-body" id="filterContainer">
+                    <div class="scrollDiv" style="height: 300px;" id="filterContainer">
                     </div>
                 </div>   
             </div>
@@ -79,15 +80,14 @@
             </div>
         </div>
     </div>
-</div>
-<!-- <div class="div centeredDiv" id="scheduleContainer" style="display: none;">
-    <div class="card" style="width: 60%; min-height: 300px;">
+    <div class="card mt-2" id="actualScheduleContainer" style="display: none;">
         <div class="card-header">
-            Filters
+            Schedules
         </div>
-        <div class="card-body" id="filterContainer">
+        <div class="card-body">
+            Stuff goes here
         </div>
     </div>
-</div> -->
+</div>
 
 {% endblock %}
