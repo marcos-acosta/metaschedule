@@ -1,10 +1,5 @@
 TODO
 
-OPERATION SEA LION:
-- Include course status in section breakdown
-- Gray out fully closed courses and remove add button
-- Only add non-closed sections to option list
-
 MISC:
 - don't reset dropdowns that were already there
 - look over code to make sure refreshing refreshes active course data

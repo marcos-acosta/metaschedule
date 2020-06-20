@@ -76,9 +76,6 @@ $(document).ready(function(){
         updateCourseList();
         $("#courseInfo").replaceWith('<div id="courseInfo"></div>');
     });
-    $("#sectionPicker").on("change", function() {
-        console.log($(this).val());
-    });
     $("#addAnyway").click(function() {
         addCourse(pending_course);
     });
@@ -87,10 +84,25 @@ $(document).ready(function(){
     });
 });
 
-function addCourse(code) {
-    selectedCourses.push(code);
+function addCourse(name) {
+    selectedCourses.push(getOpenSections(name));
     updateCourseList();
     updateScheduleDiv();
+    console.log(selectedCourses);
+}
+
+function getOpenSections(name) {
+    let sections = stump_data[nameToStump(name)]["sections"];
+    let open = [];
+    for (let i = 0; i < sections.length; i++) {
+        if (course_data[sections[i]]["courseEnrollmentStatus"] != 'closed') {
+            open.push(sections[i]);
+        }
+    }
+    return {
+        name: name,
+        openSections: open
+    };
 }
 
 function collectData(all_data) {
@@ -129,16 +141,24 @@ function constructSearchCards(results, cap) {
     let coursesAdded = 0;
     let cardsHtml = '<div id="searchResults">';
     for (let i = 0; i < results.length; i++) {
-        if (selectedCourses.includes(results[i])) {
+        let color = '';
+        let add = '';
+        // if (selectedCourses.includes(results[i])) {
+        if (dictionaryIncludes(selectedCourses, results[i])) {
             continue;
         }
         let seats = getSeatsFilled(nameToStump(results[i]));
-        let color = getColorOrGray(results[i], seats);
+        if (seats[2] == false) {
+            color = "grayCard";
+            add = "";
+        } else {
+            color = getColor(results[i]);
+            add = '<button type="button" class="close float-right" id="addCourseButton" data-id="' + results[i] + '"><span aria-hidden="true" style="color: white;">+</span></button>';
+        }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
                         '" id="addCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
-                        results[i] + ' ' + formattedSeats + '<button type="button" class="close float-right" id="addCourseButton" data-id="' + 
-                        results[i] + '"><span aria-hidden="true" style="color: white;">+</span></button></div></div>';
+                        results[i] + ' ' + formattedSeats + add + '</div></div>';
         coursesAdded++;
         if (coursesAdded == cap) {
             break;
@@ -152,13 +172,14 @@ function constructSearchCards(results, cap) {
 function constructSelectedCards() {
     let cardsHtml = '<div id="courseList">';
     for (let i = 0; i < selectedCourses.length; i++) {
-        let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
-        let color = getColorOrGray(selectedCourses[i], seats);
+        let name = selectedCourses[i]["name"];
+        let seats = getSeatsFilled(nameToStump(name));
+        let color = getColorOrGray(name, seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + 
-                        selectedCourses[i] + '" id="removeCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer;"><div class="card-body">' + selectedCourses[i] + ' ' + 
+                        name + '" id="removeCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer;"><div class="card-body">' + name + ' ' + 
                         formattedSeats + '<button type="button" class="close float-right" id="removeCourseButton" data-id="' + 
-                        selectedCourses[i] + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
+                        name + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
     }
     return cardsHtml + '</div>';
 }
@@ -179,9 +200,10 @@ function constructCourseData(name) {
     infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
     for (let i = 0; i < sections.length; i++) {
         let seats = getSectionSeatsFilled(sections[i]);
-        let color = getColorFromSeats(seats);
+        let courseStatus = course_data[sections[i]]["courseEnrollmentStatus"];
+        let color = getColorFromSeats(seats, courseStatus);
         infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + '; border-width: 2px;"><div class="card-header p-2">' + sections[i] + ' (' + 
-                    seats[0] + '/' + seats[1] + ')<div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2">' + 
+                    seats[0] + '/' + seats[1] + ') <span class="text-muted">' + courseStatus + '</span><div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2">' + 
                     formatProfs(sections[i]) + '</div></div>'
     }
     return infoHtml + '</div>';
@@ -196,12 +218,13 @@ function updateCourseList() {
 }
 
 function getFilterHtml(i) {
-    let seats = getSeatsFilled(nameToStump(selectedCourses[i]));
-    let color = getColorOrGray(selectedCourses[i], seats);
+    let name = selectedCourses[i]["name"];
+    let seats = getSeatsFilled(nameToStump(name));
+    let color = getColorOrGray(name, seats);
     let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0); cursor: pointer;" data-id="' + 
-                selectedCourses[i] + '"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + selectedCourses[i] + 
+                name + '"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + name + 
                 '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
-    let sections = stump_data[nameToStump(selectedCourses[i])]['sections'];
+    let sections = selectedCourses[i]["openSections"];
     sections.forEach(function(section) {
         html += '<option>' + section + '</option>';
     });
@@ -211,7 +234,6 @@ function getFilterHtml(i) {
 function updateScheduleDiv() {
     let html = '';
     for (let i = 0; i < selectedCourses.length; i++) {
-        // html += '<select class="selectpicker" id="sectionPicker" data-id="' + i + '"><option>Test</option></select>'
         html += getFilterHtml(i);
     }
     $("#filterContainer").html(html);
@@ -220,20 +242,37 @@ function updateScheduleDiv() {
     }
 }
 
-/* Remove item from array */
-function removeItemOnce(arr, value) { 
-    let index = arr.indexOf(value);
+function removeItemOnce(dicts, value) { 
+    let index = dictionaryIndexOf(dicts, value);
     if (index > -1) {
-        arr.splice(index, 1);
+        dicts.splice(index, 1);
     }
-    return arr;
+    return dicts;
+}
+
+function dictionaryIndexOf(dicts, key) {
+    for (let i = 0; i < dicts.length; i++) {
+        if (dicts[i]['name'] == key) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+function dictionaryIncludes(dicts, key) {
+    for (let i = 0; i < dicts.length; i++) {
+        if (dicts[i]['name'] == key) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /* Get total credits of selected courses */
 function getCreditTotal() {
     let count = 0.0;
     for (let i = 0; i < selectedCourses.length; i++) {
-        count += parseFloat(search_data[selectedCourses[i]]["credits"]);
+        count += parseFloat(search_data[selectedCourses[i]["name"]]["credits"]);
     }
     return count;
 }
@@ -302,7 +341,7 @@ function getSeatsFilled(stump) {
     for (let i = 0; i < sections.length; i++) {
         seatsFilled += course_data[sections[i]]["courseSeatsFilled"];
         seatsTotal += course_data[sections[i]]["courseSeatsTotal"];
-        if (seatsFilled < seatsTotal) {
+        if (course_data[sections[i]]["courseEnrollmentStatus"] != 'closed') {
             anyAvailable = true;
         }
     }
@@ -314,8 +353,8 @@ function getSectionSeatsFilled(code) {
     return [course['courseSeatsFilled'], course['courseSeatsTotal']];
 }
 
-function getColorFromSeats(seats) {
-    if (seats[0] >= seats[1]) {
+function getColorFromSeats(seats, enrollmentStatus) {
+    if (enrollmentStatus == 'closed') {
         return 'rgb(187, 187, 187)';
     }
     let percent = seats[0] / seats[1];
