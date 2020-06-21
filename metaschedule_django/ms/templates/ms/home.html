@@ -5,17 +5,17 @@
 </div>
 <div class="container text-center centered" id="toggleGroup" style="width:100vmax;">  
     <div class="btn-group btn-group-toggle mb-4" data-toggle="buttons">
-        <label class="btn btn-outline-primary active">
+        <label class="btn btn-outline-primary active" style="width: 150px;">
             <input type="radio" id="courseSearchButton" autocomplete="off" checked> Course search
         </label>
-        <label class="btn btn-outline-primary">
+        <label class="btn btn-outline-primary" style="width: 150px;">
             <input type="radio" id="schedulesButton" autocomplete="off"> Schedules
         </label>
     </div>
 </div>
 <div class="div centeredDiv" id="leftSide">
     <div class="row" style="height: 360px;">
-        <div class="col-sm">
+        <div class="col" style="height: 360px;">
             <div id="searchContainer">
                 <div class="card" style="width: 50rem;">
                     <div class="card-header">
@@ -48,7 +48,7 @@
                 </div>   
             </div>
         </div>
-        <div class="col-sm rightHandDiv" id="rightSide">
+        <div class="col rightHandDiv" id="rightSide" style="height: 360px;">
             <div class="row">
                 <div class="card mb-3" id ="courseInfoCard" style="height: 350px; width: 490px;">
                     <div class="card-header">
@@ -80,13 +80,23 @@
             </div>
         </div>
     </div>
-    <div class="card mt-2" id="actualScheduleContainer" style="display: none;">
-        <div class="card-header">
-            Schedules
+    <div id="scheduleGeneratorContainer" style="display: none;">
+        <div class="row mt-1 mb-1" style="height: 45px;">
+            <div class="container text-center centered">
+                <button class="btn btn-primary" id="generateButton" disabled style="cursor: initial;">Generate some schedules!</button>
+            </div>
         </div>
-        <div class="card-body">
-            Stuff goes here
+        <div class="row" id="scheduleCard">
+            <div class="card mt-2" style="width: 100%; margin-left: 15px; margin-right: 5px;">
+                <div class="card-header">
+                    Schedules
+                </div>
+                <div class="card-body">
+                    <span class="text-muted">Possible schedules will appear here when you generate them.</span>
+                </div>
+            </div>
         </div>
+
     </div>
 </div>
 

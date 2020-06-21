@@ -5,8 +5,8 @@ var selectedCourses = [];
 var course_keys;
 var search_data;
 var search_data_keys;
-var filters;
 var pending_course;
+var meta = [];
 
 /* JQUERY */
 $(document).ready(function(){
@@ -21,13 +21,13 @@ $(document).ready(function(){
         $("#searchContainer").show();
         $("#mainSelectedCoursesCard").show();
         $("#scheduleContainer").hide();
-        $("#actualScheduleContainer").hide();
+        $("#scheduleGeneratorContainer").hide();
     });
     $("#schedulesButton").change(function() {
         $("#searchContainer").hide();
         $("#mainSelectedCoursesCard").hide();
         $("#scheduleContainer").show();
-        $("#actualScheduleContainer").show();
+        $("#scheduleGeneratorContainer").show();
     });
     /* Type in search bar */
     $("#courseSearch").keyup(function(){
@@ -64,6 +64,10 @@ $(document).ready(function(){
         removeItemOnce(selectedCourses, code);
         updateCourseList();
         updateScheduleDiv();
+        if (selectedCourses.length == 0) {
+            $("#generateButton").attr('disabled', true);
+            $("#generateButton").css('cursor', 'initial');
+        }
     });
     $("#refresh").click(function() {
         $('#courseSearch').prop("disabled", true);
@@ -82,13 +86,26 @@ $(document).ready(function(){
     $("#filterInfoButton").click(function() {
         $("#filterInfoModal").modal('show');
     });
+    $("#scheduleContainer").on("change", "#sectionPicker", function() {
+        selectedCourses[$(this).attr('data-id')]["filteredSections"] = $(this).val();
+    });
+    $("#generateButton").click(function() {
+        $("#scheduleCard").slideUp("fast", "swing", function() {
+            // Calculations here
+            generatePermutations();
+            $("#scheduleCard").slideDown("fast", "swing", function() {
+                // Done with calculations
+            });
+        });
+    });
 });
 
 function addCourse(name) {
     selectedCourses.push(getOpenSections(name));
     updateCourseList();
     updateScheduleDiv();
-    console.log(selectedCourses);
+    $("#generateButton").attr('disabled', false);
+    $("#generateButton").css('cursor', 'pointer');
 }
 
 function getOpenSections(name) {
@@ -101,7 +118,8 @@ function getOpenSections(name) {
     }
     return {
         name: name,
-        openSections: open
+        openSections: open,
+        filteredSections: []
     };
 }
 
@@ -379,5 +397,35 @@ function formatProfs(code) {
             string += profs[i] + ', '
         }
         return string + 'and ' + profs[profs.length - 1];
+    }
+}
+
+function generatePermutations() {
+    meta = [];
+    permuteAllCourses(selectedCourses, [], true);
+    console.log('Final:', meta);
+}
+
+function permuteAllCourses(courses, wip, topLevel) {
+    // console.log(wip, courses.length);
+    if (courses.length == 0) {
+        meta.push(Object.assign([], wip));
+    } else {
+        let filtered = courses[0]["filteredSections"];
+        let sections;
+        if (filtered.length == 0) {
+            sections = courses[0]["openSections"];
+        } else {
+            sections = courses[0]["filteredSections"];
+        }
+        sections.forEach(function(section) {
+            if (topLevel == true) {
+                permuteAllCourses(courses.slice(1), [section], false);
+            } else {
+                wip.push(section);
+                permuteAllCourses(courses.slice(1), wip, false);
+                wip.pop();
+            }
+        });
     }
 }

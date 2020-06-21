@@ -31,61 +31,6 @@ ul {
     font-weight: 500;
 }
 
-.content-section {
-    background: #ffffff;
-    padding: 10px 20px;
-    border: 1px solid #dddddd;
-    border-radius: 3px;
-    margin-bottom: 20px;
-}
-
-.article-title {
-    color: #444444;
-}
-
-a.article-title:hover {
-    color: #428bca;
-    text-decoration: none;
-}
-
-.article-content {
-    white-space: pre-line;
-}
-
-.article-img {
-    height: 65px;
-    width: 65px;
-    margin-right: 16px;
-}
-
-.article-metadata {
-    padding-bottom: 1px;
-    margin-bottom: 4px;
-    border-bottom: 1px solid #e3e3e3
-}
-
-.article-metadata a:hover {
-    color: #333;
-    text-decoration: none;
-}
-
-.article-svg {
-    width: 25px;
-    height: 25px;
-    vertical-align: middle;
-}
-
-.account-img {
-    height: 125px;
-    width: 125px;
-    margin-right: 20px;
-    margin-bottom: 16px;
-}
-
-.account-heading {
-    font-size: 2.5rem;
-}
-
 input.searchBar {
     background-image: url('searchIcon.png'); /* Add a search icon to input */
     background-position: 10px 13px; /* Position the search icon */
@@ -210,4 +155,10 @@ input.searchBar:disabled {
     background-color: #555;
     border-radius: 25%;
     border: 2px solid darkgray;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

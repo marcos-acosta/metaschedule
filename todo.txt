@@ -1,8 +1,10 @@
 TODO
 
-MISC:
 - don't reset dropdowns that were already there
-- look over code to make sure refreshing refreshes active course data
+- fix refreshing
 - generate results button that reactivates when you change filters
 - fix title spillover
+- make all measurements relative (also change rightHandDiv css when switching tabs)
 - fix quotation marks in title
+- add time commitments
+- add mutual exclusion
