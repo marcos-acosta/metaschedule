@@ -50,7 +50,7 @@ $(document).ready(function(){
         e.stopPropagation();
         let code = $(this).attr("data-id");
         let seats = getSeatsFilled(nameToStump(code));
-        if (seats[2] == false) {
+        if (!seats[2]) {
             pending_course = code;
             $("#fullModal").modal('show');
         } else {
@@ -92,7 +92,12 @@ $(document).ready(function(){
     $("#generateButton").click(function() {
         $("#scheduleCard").slideUp("fast", "swing", function() {
             // Calculations here
-            generatePermutations();
+            let nonConflicts = getAllSchedules();
+            let html = '<ul>';
+            nonConflicts.forEach(function(sched){
+                html += '<li>' + sched + '</li>';
+            });
+            $("#scheduleBody").html(html + '</ul>');
             $("#scheduleCard").slideDown("fast", "swing", function() {
                 // Done with calculations
             });
@@ -112,7 +117,7 @@ function getOpenSections(name) {
     let sections = stump_data[nameToStump(name)]["sections"];
     let open = [];
     for (let i = 0; i < sections.length; i++) {
-        if (course_data[sections[i]]["courseEnrollmentStatus"] != 'closed') {
+        if (course_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
             open.push(sections[i]);
         }
     }
@@ -166,7 +171,7 @@ function constructSearchCards(results, cap) {
             continue;
         }
         let seats = getSeatsFilled(nameToStump(results[i]));
-        if (seats[2] == false) {
+        if (!seats[2]) {
             color = "grayCard";
             add = "";
         } else {
@@ -302,7 +307,7 @@ function getColor(name) {
 }
 
 function getColorOrGray(name, seats) {
-    if (seats[2] == false) {
+    if (!seats[2]) {
         return "grayCard";
     } else {
         return getColor(name);
@@ -359,7 +364,7 @@ function getSeatsFilled(stump) {
     for (let i = 0; i < sections.length; i++) {
         seatsFilled += course_data[sections[i]]["courseSeatsFilled"];
         seatsTotal += course_data[sections[i]]["courseSeatsTotal"];
-        if (course_data[sections[i]]["courseEnrollmentStatus"] != 'closed') {
+        if (course_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
             anyAvailable = true;
         }
     }
@@ -400,32 +405,98 @@ function formatProfs(code) {
     }
 }
 
-function generatePermutations() {
-    meta = [];
-    permuteAllCourses(selectedCourses, [], true);
-    console.log('Final:', meta);
+function permute(courseList) {
+    var r = [], max = courseList.length - 1;
+    function helper(sections, i) {
+        let actualSections;
+        if (courseList[i]["filteredSections"].length == 0) {
+            actualSections = courseList[i]["openSections"];
+        } else {
+            actualSections = courseList[i]["filteredSections"];
+        }
+        for (var j = 0, l = actualSections.length; j < l; j++) {
+            var a = sections.slice(0); // clone arr
+            a.push(actualSections[j]);
+            if (i == max)
+                r.push(a);
+            else
+                helper(a, i + 1);
+        }
+    }
+    helper([], 0);
+    return r;
 }
 
-function permuteAllCourses(courses, wip, topLevel) {
-    // console.log(wip, courses.length);
-    if (courses.length == 0) {
-        meta.push(Object.assign([], wip));
-    } else {
-        let filtered = courses[0]["filteredSections"];
-        let sections;
-        if (filtered.length == 0) {
-            sections = courses[0]["openSections"];
-        } else {
-            sections = courses[0]["filteredSections"];
+function getAllSchedules() {
+    let permutations = permute(selectedCourses);
+    let nonConflicts = [];
+    permutations.forEach(function(permutation) {
+        if (!proposedScheduleConflict(permutation)) {
+            nonConflicts.push(permutation);
         }
-        sections.forEach(function(section) {
-            if (topLevel == true) {
-                permuteAllCourses(courses.slice(1), [section], false);
-            } else {
-                wip.push(section);
-                permuteAllCourses(courses.slice(1), wip, false);
-                wip.pop();
+    });
+    return nonConflicts;
+}
+
+function proposedScheduleConflict(sections) {
+    for (let i = 0; i < sections.length - 1; i++) {
+        for (let j = i + 1; j < sections.length; j++) {
+            if (sectionsConflict(sections[i], sections[j])) {
+                return true;
             }
-        });
+        }
     }
+    return false;
+}
+
+function sectionsConflict(section1, section2) {
+    let schedules1 = course_data[section1]["courseSchedule"];
+    let schedules2 = course_data[section2]["courseSchedule"];
+    for (let i = 0; i < schedules1.length; i++) {
+        for (let j = 0; j < schedules2.length; j++) {
+            if (schedulesConflict(schedules1[i], schedules2[j])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function schedulesConflict(schedule1, schedule2) {
+    if (!daysCoincide(schedule1["scheduleDays"], schedule2["scheduleDays"])) {
+        return false;
+    } else {
+        return timesCoincide(   militaryToMinutes(schedule1["scheduleStartTime"]),
+                                militaryToMinutes(schedule1["scheduleEndTime"]),
+                                militaryToMinutes(schedule2["scheduleStartTime"]),
+                                militaryToMinutes(schedule2["scheduleEndTime"]));
+    }
+}
+
+function daysCoincide(days1, days2) {
+    if (days1.length == 0 || days2.length == 0) {
+        return false;
+    }
+    for (let i = 0; i < days1.length; i++) {
+        if (days2.indexOf(days1.charAt(i)) !== -1) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function timesCoincide(start1, end1, start2, end2) {
+    if (start1 == 0 || start2 == 0) {
+        return false;
+    }
+    if (start1 < end2 && start2 < end1) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function militaryToMinutes(military) {
+    let split = military.split(':');
+    return 60 * parseInt(split[0]) + parseInt(split[1]);
 }

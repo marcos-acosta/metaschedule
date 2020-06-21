@@ -8,3 +8,4 @@ TODO
 - fix quotation marks in title
 - add time commitments
 - add mutual exclusion
+- classes in different terms don't conflict
