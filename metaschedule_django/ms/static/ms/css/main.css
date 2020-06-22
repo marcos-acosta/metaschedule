@@ -163,22 +163,41 @@ input.searchBar:disabled {
     justify-content: center;
 }
 
-.weekday {
+.schedWrapper {
     display: grid;
-    height: 900px;
+    height: 960px;
     grid-gap: 0px;
-    grid-template-columns: 100%;
-    grid-template-rows: repeat(180, 5px);
+    grid-template-columns: 5% repeat(5, 20%);
+    grid-template-rows: repeat(192, 5px);
 }
 
-.weekday.odd {
+.hourLine {
+    border-bottom: 1px dashed rgb(189, 189, 189);
+}
+
+.thinHourLine {
+    border-bottom: 1px solid rgb(189, 189, 189);
+}
+
+.thickerHourLine {
+    border-bottom: 2px solid rgb(189, 189, 189);
+}
+
+.dayLabel {
+    background-color: white;
+    text-align: center;
+    font-weight: bold;
+    padding-top: 30px;
+}
+
+.oddDay {
     background-color: rgb(233, 233, 233);
 }
 
 .box {
-    background-color: #444;
     color: #fff;
     border-radius: 5px;
-    padding: 10px;
-    font-size: 150%;
+    padding: 5px;
+    font-size: 80%;
+    text-align: center;
 }
