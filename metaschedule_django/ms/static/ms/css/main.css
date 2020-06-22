@@ -162,3 +162,23 @@ input.searchBar:disabled {
     align-items: center;
     justify-content: center;
 }
+
+.weekday {
+    display: grid;
+    height: 900px;
+    grid-gap: 0px;
+    grid-template-columns: 100%;
+    grid-template-rows: repeat(180, 5px);
+}
+
+.weekday.odd {
+    background-color: rgb(233, 233, 233);
+}
+
+.box {
+    background-color: #444;
+    color: #fff;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 150%;
+}

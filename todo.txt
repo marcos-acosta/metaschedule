@@ -1,5 +1,11 @@
 TODO
 
+OPERATION MAYA
+- display a schedule (easier said than done)
+- pagination
+- availability score
+
+MISC
 - don't reset dropdowns that were already there
 - fix refreshing
 - generate results button that reactivates when you change filters
