@@ -90,18 +90,27 @@
             <div class="card mt-2" style="width: 100%; margin-left: 15px; margin-right: 5px;">
                 <div class="card-header">
                     Schedules
+                    <!-- <button class="btn btn-warning" id="testeroni">Test</button> -->
                 </div>
                 <div class="card-body" id="scheduleBody">
                     <span class="text-muted" id="info">Possible schedules will appear here when you generate them.</span>
+                    <div id="noPerms" class="alert alert-warning" style="display: none;">It doesn't look like there's any open schedules with these courses!</div>
                     <div class="container" id="wholeScheduleContainer" style="display: none;">
                         <div class="container" style="width: 100%;">
                             <div class="row">
-                                <div style="width: 80%;">
-                                    <button class="btn btn-outline-primary" style="width: 20%; margin-left: 42%;" id="previous" disabled>< Previous</button>
-                                    <button class="btn btn-outline-primary" style="width: 20%;" id="next">Next ></button>
+                                <div style="width: 20%;">
+                                    <div class="card ml-1" style="width: 100%; min-height: 60px; float: left; text-align: center; border-width: 2px;" id="count">
+                                        <span style="font-size: 20px; margin: auto;" id="countNumber">
+                                        </span>
+                                    </div>
+                                </div>
+                                <div style="width: 60%; text-align: center;">
+                                    <button class="btn btn-outline-primary" style="display: inline-block; width: 20%;" id="previous" disabled>< Previous</button>
+                                    <span id="page" class="ml-1 mr-1" style="display: inline-block; min-width: 10%;"></span>
+                                    <button class="btn btn-outline-primary" style="display: inline-block; width: 20%;" id="next">Next ></button>
                                 </div>
                                 <div style="width: 20%;">
-                                    <div class="card mr-2" style="width: 100%; float: right; text-align: center; border-width: 2px; border-color: red;" id="availability">
+                                    <div class="card mr-1" style="width: 100%; float: right; min-height: 60px; text-align: center; border-width: 2px;" id="availability">
                                         <span style="font-size: 20px;">
                                             Lowest availability: <span id="score"></span>%
                                         </span>
@@ -111,6 +120,9 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        <div class="container mt-2 mb-0" style="width: 100%; text-align: center;" id="classes">
+                            
                         </div>
                         <div class="container text-center centered">
                             <div class="row" style="margin-left: 0%; width: 90%;">
@@ -157,10 +169,6 @@
                                     <div id="8pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 145 / 157;"></div>
                                     <div id="9pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 157 / 169;"></div>
                                     <div id="10pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 169 / 181;"></div>
-                                    
-                                    <!-- <div class="box blueCard" style="grid-row: 13 / 25; grid-column: 2 / 3;"><b>ENGR 79 HM-01</b><p>Engineering Systems</div>
-                                    <div class="box" style="grid-row: 73 / 85; grid-column: 3 / 4">7</div>
-                                    <div class="box" style="grid-row: 133 / 145; grid-column: 4 / 5">12</div> -->
                                 </div>
                             </div>
                         </div>

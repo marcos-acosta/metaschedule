@@ -1,10 +1,5 @@
 TODO
 
-OPERATION MAYA
-- replicate and fix bug with lingering box
-- get info when clicking on box
-- show sections on the side
-
 MISC
 - don't reset dropdowns that were already there
 - fix refreshing
@@ -17,4 +12,7 @@ MISC
 - add mutual exclusion
 - classes in different terms don't conflict
 - add location to info
-- have special message if no schedules are possible
+- don't use django
+- last refreshed
+- include time to info
+- better way to get section info from schedule

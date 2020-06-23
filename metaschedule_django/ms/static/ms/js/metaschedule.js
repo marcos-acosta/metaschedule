@@ -44,7 +44,12 @@ $(document).ready(function(){
     });
     $("#resultsContainer, #selectedContainer, #filterContainer").on("click", ".card", function(){
         let name = $(this).attr("data-id");
-        let info = constructCourseData(name);
+        let info = constructCourseData(nameToStump(name));
+        $("#courseInfo").replaceWith(info);
+    });
+    $("#scheduleBody").on("click", ".box", function(){
+        let code = $(this).attr("data-id");
+        let info = constructCourseData(code.split('-')[0]);
         $("#courseInfo").replaceWith(info);
     });
     /* Add a course to your cart */
@@ -94,25 +99,30 @@ $(document).ready(function(){
     $("#generateButton").click(function() {
         $("#scheduleCard").slideUp("fast", "swing", function() {
             $("#info").remove();
-            $("#wholeScheduleContainer").show();
-            current = 0;
             nonConflicts = getAllSchedules();
-            // console.log(nonConflicts);
-            generate();
+            console.log('Permutations:', nonConflicts);
+            current = 0;
             updateButtons();
+            if (nonConflicts.length == 0) {
+                $("#wholeScheduleContainer").hide();
+                $("#noPerms").show();
+            } else {
+                sortByAvailability();
+                $("#wholeScheduleContainer").show();
+                $("#noPerms").hide();
+                generate();
+            }
             $("#scheduleCard").slideDown("fast", "swing", function() {
                 // Done with calculations
             });
         });
     });
     $("#next").click(function() {
-        $(".box").remove();
         current++;
         generate();
         updateButtons();
     });
     $("#previous").click(function() {
-        $(".box").remove();
         current--;
         generate();
         updateButtons();
@@ -120,12 +130,25 @@ $(document).ready(function(){
 });
 
 function generate() {
+    $(".box").remove();
     let html = getFullSchedule(nonConflicts[current]);
     let availability = getLowestAvailability(nonConflicts[current]);
+    $("#countNumber").html(getNumberPermutations());
+    $("#classes").html(generateCourseCards(nonConflicts[current]));
     $("#score").html(availability[2]);
+    $("#page").html((current + 1) + '/' + nonConflicts.length);
     $("#actualScore").html(availability[0] + '/' + availability[1]);
     $("#availability").css('border-color', availability[3]);
     $("#realDeal").append(html);
+}
+
+function getNumberPermutations() {
+    let num = nonConflicts.length;
+    if (num == 1) {
+        return '1 permutation';
+    } else {
+        return num + ' permutations';
+    }
 }
 
 function updateButtons() {
@@ -140,7 +163,7 @@ function updateButtons() {
         $("#previous").addClass('btn-outline-primary');
         $("#previous").css('cursor', 'pointer');
     }
-    if (current == nonConflicts.length - 1) {
+    if (current >= nonConflicts.length - 1) {
         $("#next").attr('disabled', true);
         $("#next").removeClass('btn-outline-primary');
         $("#next").addClass('btn-outline-secondary');
@@ -255,8 +278,7 @@ function constructSelectedCards() {
     return cardsHtml + '</div>';
 }
 
-function constructCourseData(name) {
-    let stump = nameToStump(name);
+function constructCourseData(stump) {
     let sections = stump_data[stump]["sections"];
     let credits = course_data[sections[0]]['courseCredits'];
     let description;
@@ -266,7 +288,7 @@ function constructCourseData(name) {
         description = '<b>(' + credits + ' credits) </b>' + course_data[sections[0]]['courseDescription'];
     }
     let infoHtml = '<div id="courseInfo">';
-    infoHtml += '<h5>' + name + '</h5><hr><span style="font-size: 14px;">';
+    infoHtml += '<h5>' + stump + ' | ' + course_data[sections[0]]["courseName"] + '</h5><hr><span style="font-size: 14px;">';
     infoHtml += description;
     infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
     for (let i = 0; i < sections.length; i++) {
@@ -577,8 +599,8 @@ function getCalendarEvent(section) {
         }
         let end = schedules[i]["scheduleEndTime"];
         for (let i = 0; i < days.length; i++) {
-            html += '<div class="box ' + color + '" style="grid-row: ' + timeToRow(start) + ' / ' + timeToRow(end) + 
-                    '; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + abridgeForSchedule(name) + '</div>';
+            html += '<div class="box ' + color + '" data-id="' + section + '" style="grid-row: ' + timeToRow(start) + ' / ' + timeToRow(end) + 
+                    '; cursor: pointer; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + abridgeForSchedule(name) + '</div>';
         }
     }
     return html;
@@ -606,10 +628,8 @@ function getLowestAvailability(sections) {
     let highest = [0, 0, 0];
     sections.forEach(function(section) {
         let seats = getSectionSeatsFilled(section);
-        console.log(seats);
         if (seats[1] != 0) {
             if (seats[0] / seats[1] > highest[2]) {
-                console.log('here');
                 highest = [seats[0], seats[1], seats[0] / seats[1]];
             }
         }
@@ -621,4 +641,27 @@ function getLowestAvailability(sections) {
 function getColorFromAvailability(percent) {
     let h = Math.round(15 + percent * 95);
     return 'hsl(' + h + ', 73%, 55%)';
+}
+
+function sortByAvailability() {
+    nonConflicts.sort(function(x, y) {
+        let xa = getLowestAvailability(x)[2];
+        let ya = getLowestAvailability(y)[2];
+        if (xa == ya) {
+            return 0;
+        } if (xa > ya) {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
+}
+
+function generateCourseCards(sections) {
+    let html = '';
+    sections.forEach(function(section) {
+        html += '<div class="card ml-1 mr-1 p-2 ' + getColor(section) + '" style="display: inline-block;">' + section + '</div>';
+    });
+    console.log(html);
+    return html;
 }
