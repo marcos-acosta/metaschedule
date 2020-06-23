@@ -7,6 +7,8 @@ var search_data;
 var search_data_keys;
 var pending_course;
 var meta = [];
+var current = 0;
+var nonConflicts;
 
 /* JQUERY */
 $(document).ready(function(){
@@ -91,19 +93,65 @@ $(document).ready(function(){
     });
     $("#generateButton").click(function() {
         $("#scheduleCard").slideUp("fast", "swing", function() {
-            // Calculations here
-            let nonConflicts = getAllSchedules();
-            let html = '<ul>';
-            nonConflicts.forEach(function(sched){
-                html += '<li>' + sched + '</li>';
-            });
-            $("#scheduleBody").html(html + '</ul>');
+            $("#info").remove();
+            $("#wholeScheduleContainer").show();
+            current = 0;
+            nonConflicts = getAllSchedules();
+            // console.log(nonConflicts);
+            generate();
+            updateButtons();
             $("#scheduleCard").slideDown("fast", "swing", function() {
                 // Done with calculations
             });
         });
     });
+    $("#next").click(function() {
+        $(".box").remove();
+        current++;
+        generate();
+        updateButtons();
+    });
+    $("#previous").click(function() {
+        $(".box").remove();
+        current--;
+        generate();
+        updateButtons();
+    });
 });
+
+function generate() {
+    let html = getFullSchedule(nonConflicts[current]);
+    let availability = getLowestAvailability(nonConflicts[current]);
+    $("#score").html(availability[2]);
+    $("#actualScore").html(availability[0] + '/' + availability[1]);
+    $("#availability").css('border-color', availability[3]);
+    $("#realDeal").append(html);
+}
+
+function updateButtons() {
+    if (current == 0) {
+        $("#previous").attr('disabled', true);
+        $("#previous").removeClass('btn-outline-primary');
+        $("#previous").addClass('btn-outline-secondary');
+        $("#previous").css('cursor', 'initial');
+    } else {
+        $("#previous").attr('disabled', false);
+        $("#previous").removeClass('btn-outline-secondary');
+        $("#previous").addClass('btn-outline-primary');
+        $("#previous").css('cursor', 'pointer');
+    }
+    if (current == nonConflicts.length - 1) {
+        $("#next").attr('disabled', true);
+        $("#next").removeClass('btn-outline-primary');
+        $("#next").addClass('btn-outline-secondary');
+        $("#next").css('cursor', 'initial');
+    } else {
+        $("#next").attr('disabled', false);
+        $("#next").removeClass('btn-outline-secondary');
+        $("#next").addClass('btn-outline-primary');
+        $("#next").css('cursor', 'pointer');
+    }
+}
 
 function addCourse(name) {
     selectedCourses.push(getOpenSections(name));
@@ -380,6 +428,9 @@ function getColorFromSeats(seats, enrollmentStatus) {
     if (enrollmentStatus == 'closed') {
         return 'rgb(187, 187, 187)';
     }
+    if (seats[1] == 0) {
+        return 'rgb(128, 204, 29)';
+    }
     let percent = seats[0] / seats[1];
     let colors = ['rgb(173, 52, 12)', 'rgb(207, 138, 19)', 'rgb(255, 246, 82)', 'rgb(128, 204, 29)'];
     let h = (100 - Math.round(percent * 100))/100;
@@ -499,4 +550,75 @@ function timesCoincide(start1, end1, start2, end2) {
 function militaryToMinutes(military) {
     let split = military.split(':');
     return 60 * parseInt(split[0]) + parseInt(split[1]);
+}
+
+function getFullSchedule(sections) {
+    let html = '';
+    sections.forEach(function(section) {
+        html += getCalendarEvent(section);
+    });
+    return html;
+}
+
+function getCalendarEvent(section) {
+    let color = getColor(section);
+    let schedules = course_data[section]["courseSchedule"];
+    let name = course_data[section]["courseName"];
+    let html = '';
+    let seats = getSectionSeatsFilled(section);
+    for (let i = 0; i < schedules.length; i++) {
+        let days = schedules[i]["scheduleDays"];
+        if (days == '') {
+            continue;
+        }
+        let start = schedules[i]["scheduleStartTime"];
+        if (militaryToMinutes(start) == 0) {
+            continue;
+        }
+        let end = schedules[i]["scheduleEndTime"];
+        for (let i = 0; i < days.length; i++) {
+            html += '<div class="box ' + color + '" style="grid-row: ' + timeToRow(start) + ' / ' + timeToRow(end) + 
+                    '; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + abridgeForSchedule(name) + '</div>';
+        }
+    }
+    return html;
+}
+
+function timeToRow(time) {
+    let split = time.split(':');
+    return (parseInt(split[0])-7)*12 + 1 + Math.floor(parseInt(split[1])/5);
+}
+
+function dayToCols(day) {
+    let days = ['M', 'T', 'W', 'R', 'F'];
+    let index = days.indexOf(day);
+    return (index + 2) + ' / ' + (index + 3);
+}
+
+function abridgeForSchedule(name) {
+    if (name.length > 24) {
+        return name.substring(0, 23) + '...';
+    }
+    return name;
+}
+
+function getLowestAvailability(sections) {
+    let highest = [0, 0, 0];
+    sections.forEach(function(section) {
+        let seats = getSectionSeatsFilled(section);
+        console.log(seats);
+        if (seats[1] != 0) {
+            if (seats[0] / seats[1] > highest[2]) {
+                console.log('here');
+                highest = [seats[0], seats[1], seats[0] / seats[1]];
+            }
+        }
+    });
+    let availability = 1 - highest[2];
+    return [highest[0], highest[1], Math.round(availability * 100), getColorFromAvailability(availability)];
+}
+
+function getColorFromAvailability(percent) {
+    let h = Math.round(15 + percent * 95);
+    return 'hsl(' + h + ', 73%, 55%)';
 }

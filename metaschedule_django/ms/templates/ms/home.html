@@ -92,56 +92,76 @@
                     Schedules
                 </div>
                 <div class="card-body" id="scheduleBody">
-                    <span class="text-muted">Possible schedules will appear here when you generate them.</span>
-                    <div class="container centered">
-                        <div class="row" style="margin-left: 0%; width: 90%;">
-                            <div class="schedWrapper" style="width: 100%;">
-                                <div id="mondayColumn" class="oddDay" style="grid-column: 2 / 3; grid-row: 1 / 192;"></div>
-                                <div id="wednesdayColumn" class="oddDay" style="grid-column: 4 / 5; grid-row: 1 / 192;"></div>
-                                <div id="fridayColumn" class="oddDay" style="grid-column: 6 / 7; grid-row: 1 / 192;"></div>
-
-                                <div id="8aLabel" class="" style="grid-column: 1 / 2; grid-row: 13 / 15;">8 am</div>
-                                <div id="9aLabel" class="" style="grid-column: 1 / 2; grid-row: 25 / 37;">9 am</div>
-                                <div id="10aLabel" class="" style="grid-column: 1 / 2; grid-row: 37 / 49;">10 am</div>
-                                <div id="11aLabel" class="" style="grid-column: 1 / 2; grid-row: 49 / 61;">11 am</div>
-                                <div id="12pLabel" class="" style="grid-column: 1 / 2; grid-row: 61 / 73;">12 pm</div>
-                                <div id="1pLabel" class="" style="grid-column: 1 / 2; grid-row: 73 / 85;">1 pm</div>
-                                <div id="2pLabel" class="" style="grid-column: 1 / 2; grid-row: 85 / 97;">2 pm</div>
-                                <div id="3pLabel" class="" style="grid-column: 1 / 2; grid-row: 97 / 109;">3 pm</div>
-                                <div id="4pLabel" class="" style="grid-column: 1 / 2; grid-row: 109 / 121;">4 pm</div>
-                                <div id="5pLabel" class="" style="grid-column: 1 / 2; grid-row: 121 / 133;">5 pm</div>
-                                <div id="6pLabel" class="" style="grid-column: 1 / 2; grid-row: 133 / 145;">6 pm</div>
-                                <div id="7pLabel" class="" style="grid-column: 1 / 2; grid-row: 145 / 157;">7 pm</div>
-                                <div id="8pLabel" class="" style="grid-column: 1 / 2; grid-row: 157 / 169;">8 pm</div>
-                                <div id="9pLabel" class="" style="grid-column: 1 / 2; grid-row: 169 / 181;">9 pm</div>
-                                <div id="10pLabel" class="" style="grid-column: 1 / 2; grid-row: 181 / 193;">10 pm</div>
-
-                                <div id="mondayLabel" class="dayLabel" style="grid-column: 2 / 3; grid-row: 1 / 13;">Monday</div>
-                                <div id="tuesdayLabel" class="dayLabel" style="grid-column: 3 / 4; grid-row: 1 / 13;">Tuesday</div>
-                                <div id="wednesdayLabel" class="dayLabel" style="grid-column: 4 / 5; grid-row: 1 / 13;">Wednesday</div>
-                                <div id="thursdayLabel" class="dayLabel" style="grid-column: 5 / 6; grid-row: 1 / 13;">Thursday</div>
-                                <div id="fridayLabel" class="dayLabel" style="grid-column: 6 / 7; grid-row: 1 / 13;">Friday</div>
-
-
-                                <div id="8aLine" class="thinHourLine" style="grid-column: 2 / 7; grid-row: 1 / 13;"></div>
-                                <div id="9aLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 13 / 25;"></div>
-                                <div id="10aLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 25 / 37;"></div>
-                                <div id="11aLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 37 / 49;"></div>
-                                <div id="12pLine" class="thickerHourLine" style="grid-column: 2 / 7; grid-row: 49 / 61;"></div>
-                                <div id="1pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 61 / 73;"></div>
-                                <div id="2pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 73 / 85;"></div>
-                                <div id="3pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 85 / 97;"></div>
-                                <div id="4pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 97 / 109;"></div>
-                                <div id="5pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 109 / 121;"></div>
-                                <div id="6pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 121 / 133;"></div>
-                                <div id="7pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 133 / 145;"></div>
-                                <div id="8pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 145 / 157;"></div>
-                                <div id="9pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 157 / 169;"></div>
-                                <div id="10pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 169 / 181;"></div>
-                                
-                                <div class="box blueCard" style="grid-row: 13 / 25; grid-column: 2 / 3;"><b>ENGR 79 HM-01</b><p>Engineering Systems</div>
-                                <div class="box" style="grid-row: 73 / 85; grid-column: 3 / 4">7</div>
-                                <div class="box" style="grid-row: 133 / 145; grid-column: 4 / 5">12</div>
+                    <span class="text-muted" id="info">Possible schedules will appear here when you generate them.</span>
+                    <div class="container" id="wholeScheduleContainer" style="display: none;">
+                        <div class="container" style="width: 100%;">
+                            <div class="row">
+                                <div style="width: 80%;">
+                                    <button class="btn btn-outline-primary" style="width: 20%; margin-left: 42%;" id="previous" disabled>< Previous</button>
+                                    <button class="btn btn-outline-primary" style="width: 20%;" id="next">Next ></button>
+                                </div>
+                                <div style="width: 20%;">
+                                    <div class="card mr-2" style="width: 100%; float: right; text-align: center; border-width: 2px; border-color: red;" id="availability">
+                                        <span style="font-size: 20px;">
+                                            Lowest availability: <span id="score"></span>%
+                                        </span>
+                                        <span class="text-muted">
+                                            <span id="actualScore"></span> seats filled
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="container text-center centered">
+                            <div class="row" style="margin-left: 0%; width: 90%;">
+                                <div class="schedWrapper" id="realDeal" style="width: 100%;">
+                                    <div id="mondayColumn" class="oddDay" style="grid-column: 2 / 3; grid-row: 1 / 192;"></div>
+                                    <div id="wednesdayColumn" class="oddDay" style="grid-column: 4 / 5; grid-row: 1 / 192;"></div>
+                                    <div id="fridayColumn" class="oddDay" style="grid-column: 6 / 7; grid-row: 1 / 192;"></div>
+    
+                                    <div id="8aLabel" class="" style="grid-column: 1 / 2; grid-row: 13 / 15;">8 am</div>
+                                    <div id="9aLabel" class="" style="grid-column: 1 / 2; grid-row: 25 / 37;">9 am</div>
+                                    <div id="10aLabel" class="" style="grid-column: 1 / 2; grid-row: 37 / 49;">10 am</div>
+                                    <div id="11aLabel" class="" style="grid-column: 1 / 2; grid-row: 49 / 61;">11 am</div>
+                                    <div id="12pLabel" class="" style="grid-column: 1 / 2; grid-row: 61 / 73;">12 pm</div>
+                                    <div id="1pLabel" class="" style="grid-column: 1 / 2; grid-row: 73 / 85;">1 pm</div>
+                                    <div id="2pLabel" class="" style="grid-column: 1 / 2; grid-row: 85 / 97;">2 pm</div>
+                                    <div id="3pLabel" class="" style="grid-column: 1 / 2; grid-row: 97 / 109;">3 pm</div>
+                                    <div id="4pLabel" class="" style="grid-column: 1 / 2; grid-row: 109 / 121;">4 pm</div>
+                                    <div id="5pLabel" class="" style="grid-column: 1 / 2; grid-row: 121 / 133;">5 pm</div>
+                                    <div id="6pLabel" class="" style="grid-column: 1 / 2; grid-row: 133 / 145;">6 pm</div>
+                                    <div id="7pLabel" class="" style="grid-column: 1 / 2; grid-row: 145 / 157;">7 pm</div>
+                                    <div id="8pLabel" class="" style="grid-column: 1 / 2; grid-row: 157 / 169;">8 pm</div>
+                                    <div id="9pLabel" class="" style="grid-column: 1 / 2; grid-row: 169 / 181;">9 pm</div>
+                                    <div id="10pLabel" class="" style="grid-column: 1 / 2; grid-row: 181 / 193;">10 pm</div>
+    
+                                    <div id="mondayLabel" class="dayLabel" style="grid-column: 2 / 3; grid-row: 1 / 13;">Monday</div>
+                                    <div id="tuesdayLabel" class="dayLabel" style="grid-column: 3 / 4; grid-row: 1 / 13;">Tuesday</div>
+                                    <div id="wednesdayLabel" class="dayLabel" style="grid-column: 4 / 5; grid-row: 1 / 13;">Wednesday</div>
+                                    <div id="thursdayLabel" class="dayLabel" style="grid-column: 5 / 6; grid-row: 1 / 13;">Thursday</div>
+                                    <div id="fridayLabel" class="dayLabel" style="grid-column: 6 / 7; grid-row: 1 / 13;">Friday</div>
+    
+    
+                                    <div id="8aLine" class="thinHourLine" style="grid-column: 2 / 7; grid-row: 1 / 13;"></div>
+                                    <div id="9aLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 13 / 25;"></div>
+                                    <div id="10aLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 25 / 37;"></div>
+                                    <div id="11aLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 37 / 49;"></div>
+                                    <div id="12pLine" class="thickerHourLine" style="grid-column: 2 / 7; grid-row: 49 / 61;"></div>
+                                    <div id="1pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 61 / 73;"></div>
+                                    <div id="2pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 73 / 85;"></div>
+                                    <div id="3pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 85 / 97;"></div>
+                                    <div id="4pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 97 / 109;"></div>
+                                    <div id="5pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 109 / 121;"></div>
+                                    <div id="6pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 121 / 133;"></div>
+                                    <div id="7pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 133 / 145;"></div>
+                                    <div id="8pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 145 / 157;"></div>
+                                    <div id="9pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 157 / 169;"></div>
+                                    <div id="10pLine" class="hourLine" style="grid-column: 2 / 7; grid-row: 169 / 181;"></div>
+                                    
+                                    <!-- <div class="box blueCard" style="grid-row: 13 / 25; grid-column: 2 / 3;"><b>ENGR 79 HM-01</b><p>Engineering Systems</div>
+                                    <div class="box" style="grid-row: 73 / 85; grid-column: 3 / 4">7</div>
+                                    <div class="box" style="grid-row: 133 / 145; grid-column: 4 / 5">12</div> -->
+                                </div>
                             </div>
                         </div>
                     </div>

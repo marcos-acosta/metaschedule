@@ -1,13 +1,14 @@
 TODO
 
 OPERATION MAYA
-- display a schedule (easier said than done)
-- pagination
-- availability score
+- replicate and fix bug with lingering box
+- get info when clicking on box
+- show sections on the side
 
 MISC
 - don't reset dropdowns that were already there
 - fix refreshing
+- auto refreshing?
 - generate results button that reactivates when you change filters
 - fix title spillover
 - make all measurements relative (also change rightHandDiv css when switching tabs)
@@ -15,3 +16,5 @@ MISC
 - add time commitments
 - add mutual exclusion
 - classes in different terms don't conflict
+- add location to info
+- have special message if no schedules are possible
