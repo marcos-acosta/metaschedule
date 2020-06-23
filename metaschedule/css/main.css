@@ -197,6 +197,7 @@ input.searchBar:disabled {
 .box {
     color: #fff;
     padding: 5px;
-    font-size: 80%;
+    font-size: 12px;
     text-align: center;
+    overflow: hidden;
 }

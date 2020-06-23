@@ -22,13 +22,13 @@ $(document).ready(function(){
     $("#courseSearchButton").change(function() {
         $("#searchContainer").show();
         $("#mainSelectedCoursesCard").show();
-        $("#scheduleContainer").hide();
+        $("#scheduleContainer").css('display', 'none');
         $("#scheduleGeneratorContainer").hide();
     });
     $("#schedulesButton").change(function() {
         $("#searchContainer").hide();
         $("#mainSelectedCoursesCard").hide();
-        $("#scheduleContainer").show();
+        $("#scheduleContainer").css('display', 'inline-block');
         $("#scheduleGeneratorContainer").show();
     });
     /* Type in search bar */
@@ -251,7 +251,7 @@ function constructSearchCards(results, cap) {
         }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
-                        '" id="addCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
+                        '" id="addCard" style="overflow:hidden; border-color: rgba(255, 0, 0, 0); cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
                         results[i] + ' ' + formattedSeats + add + '</div></div>';
         coursesAdded++;
         if (coursesAdded == cap) {
@@ -271,8 +271,8 @@ function constructSelectedCards() {
         let color = getColorOrGray(name, seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + 
-                        name + '" id="removeCard" style="border-color: rgba(255, 0, 0, 0); cursor: pointer;"><div class="card-body">' + name + ' ' + 
-                        formattedSeats + '<button type="button" class="close float-right" id="removeCourseButton" data-id="' + 
+                        name + '" id="removeCard" style="height: 90px; border-color: rgba(255, 0, 0, 0); cursor: pointer; overflow: hidden;"><div class="card-body">' + name + ' ' + 
+                        formattedSeats + '<button style="position: absolute; top: 15px; right: 15px;" type="button" class="close" id="removeCourseButton" data-id="' + 
                         name + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
     }
     return cardsHtml + '</div>';
@@ -315,8 +315,8 @@ function getFilterHtml(i) {
     let seats = getSeatsFilled(nameToStump(name));
     let color = getColorOrGray(name, seats);
     let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0); cursor: pointer;" data-id="' + 
-                name + '"><div class="card-body p-2"><span class="ml-2" style="position: absolute; top: 15px;">' + name + 
-                '</span><select class="selectpicker float-right mt-0" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
+                name + '"><div class="card-body p-2"><div class="ml-2" style="position: absolute; top: 15px; width: 67%;">' + name + 
+                '</div><select class="selectpicker float-right mt-0" data-width="28%" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
     let sections = selectedCourses[i]["openSections"];
     sections.forEach(function(section) {
         html += '<option>' + section + '</option>';
@@ -600,7 +600,7 @@ function getCalendarEvent(section) {
         let end = schedules[i]["scheduleEndTime"];
         for (let i = 0; i < days.length; i++) {
             html += '<div class="box ' + color + '" data-id="' + section + '" style="grid-row: ' + timeToRow(start) + ' / ' + timeToRow(end) + 
-                    '; cursor: pointer; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + abridgeForSchedule(name) + '</div>';
+                    '; cursor: pointer; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + name + '</div>';
         }
     }
     return html;
@@ -615,13 +615,6 @@ function dayToCols(day) {
     let days = ['M', 'T', 'W', 'R', 'F'];
     let index = days.indexOf(day);
     return (index + 2) + ' / ' + (index + 3);
-}
-
-function abridgeForSchedule(name) {
-    if (name.length > 24) {
-        return name.substring(0, 23) + '...';
-    }
-    return name;
 }
 
 function getLowestAvailability(sections) {
