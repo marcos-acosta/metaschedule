@@ -48,7 +48,40 @@
                     <div class="modal-body">
                         In the filter panel, you can select specific course sections that you would want in your schedule. Note that 
                         you can select multiple sections from each course, and that not selecting any filters for a course means you're 
-                        okay with any section of that course.
+                        okay with any section of that course. <span class="text-muted">Note that closed sections aren't included.</span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Help</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            <b>Metaschedule</b> is a tool for building possible schedules when you know which courses you want to take but don't know for 
+                            sure which sections will be available. You can search for courses in the <b>course search</b> panel and add any course
+                            with the <b>+</b> button. You can also see information about the course and its sections by clicking on the course card
+                            anywhere you see one. <span class="text-muted">Note that courses whose sections are all closed are grayed out.</span>
+                        </p>
+                        <p>
+                            In the <b>filter</b> panel, you can be more specific about your courses. If you don't have any section preferences, you can add no
+                            filters. If you know you want to take a specific section of a course, you can select that section, and if you'd like to consider multiple,
+                            you can do that too! <span class="text-muted">(Closed sections aren't included.)</span> Whenever you'd like to generate schedules from your selections, you can hit the 
+                            <b>generate schedules</b> button. You can then scroll through the permutations calculated, which are sorted by the lowest course availability 
+                            in each permutation.
+                        </p>
+                        <p>
+                            Hope this helped!
+                        </p>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal">Got it!</button>
@@ -84,7 +117,10 @@
         </header>
         <br>
         <main role="main" class="div mainDiv">
-            <div class="btn btn-primary float-right" id="refresh">
+            <div class="btn btn-outline-secondary float-left" id="help" style="width: 8%;">
+                Help
+            </div>
+            <div class="btn btn-primary float-right" id="refresh" style="width: 8%;">
                 Refresh
             </div>
             <div class="container text-center centered" id="toggleGroup" style="width:100vmax;">  
@@ -136,7 +172,7 @@
                         <div class="row">
                             <div class="card mb-3" id ="courseInfoCard" style="height: 350px; width: 100%;">
                                 <div class="card-header">
-                                    Course info
+                                    Course info and sections
                                 </div>
                                 <div class="scrollDiv" style="height: 300px;" id="infoContainer">
                                     <div id="courseInfo">

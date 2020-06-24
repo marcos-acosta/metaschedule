@@ -3,16 +3,17 @@ TODO
 OPERATION HYDRA
 - Netlify
 
+OPERATION COLOSSUS
+- Code review!
+
+OPERATION TITAN
+- Refreshing
+- Display time since last refresh
+
 MISC
 - don't reset dropdowns that were already there
-- fix refreshing
-- auto refreshing?
 - generate results button that reactivates when you change filters
-- fix quotation marks in title
 - add time commitments
 - add mutual exclusion
 - classes in different terms don't conflict
-- add location to info
-- last refreshed
-- include time to info
 - better way to get section info from schedule

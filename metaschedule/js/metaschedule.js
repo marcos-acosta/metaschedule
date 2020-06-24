@@ -93,6 +93,9 @@ $(document).ready(function(){
     $("#filterInfoButton").click(function() {
         $("#filterInfoModal").modal('show');
     });
+    $("#help").click(function() {
+        $("#helpModal").modal('show');
+    });
     $("#scheduleContainer").on("change", "#sectionPicker", function() {
         selectedCourses[$(this).attr('data-id')]["filteredSections"] = $(this).val();
     });
@@ -296,8 +299,8 @@ function constructCourseData(stump) {
         let courseStatus = course_data[sections[i]]["courseEnrollmentStatus"];
         let color = getColorFromSeats(seats, courseStatus);
         infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + '; border-width: 2px;"><div class="card-header p-2">' + sections[i] + ' (' + 
-                    seats[0] + '/' + seats[1] + ') <span class="text-muted">' + courseStatus + '</span><div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2">' + 
-                    formatProfs(sections[i]) + '</div></div>'
+                    seats[0] + '/' + seats[1] + ') <span class="text-muted">' + courseStatus + '</span><div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2 pb-1">' + 
+                    formatProfs(sections[i]) + '<br><ul>' + getTimePlace(sections[i]) + '</ul></div></div>';
     }
     return infoHtml + '</div>';
 }
@@ -418,7 +421,7 @@ function generateSearches() {
     stump_keys = Object.keys(stump_data)
     for (let i = 0; i < stump_keys.length; i++) {
         let course = course_data[stump_data[stump_keys[i]]["sections"][0]];
-        search_data[stump_keys[i] + ' ' + course['courseName']] = {
+        search_data[stump_keys[i] + ' ' + fixQuotationMarks(course['courseName'])] = {
             "stump": stump_keys[i],
             "credits": course['courseCredits']
         }
@@ -658,3 +661,63 @@ function generateCourseCards(sections) {
     console.log(html);
     return html;
 }
+
+function getTimePlace(section) {
+    let schedules = course_data[section]["courseSchedule"];
+    let html = '';
+    for (let i = 0; i < schedules.length; i++) {
+        let days = schedules[i]["scheduleDays"];
+        let location = schedules[i]["scheduleLocation"];
+        if (days == '') {
+            days = 'No days specified';
+        } if (location == '' || location == 'N/A') {
+            location = 'no location specified';
+        }
+        html += '<li><span class="text-muted">' + days + ', ' + militaryToRegular(schedules[i]["scheduleStartTime"]) + ' – ' + 
+                militaryToRegular(schedules[i]["scheduleEndTime"]) + '; ' + location + '</span></li>';
+    }
+    return html;
+    
+}
+
+function militaryToRegular(military) {
+    let split = military.split(':');
+    let hours, minutes, am_pm;
+    if (parseInt(split[0]) > 12) {
+        hours = parseInt(split[0]) - 12;
+        am_pm = 'PM';
+    } else {
+        hours = parseInt(split[0]);
+        am_pm = 'AM';
+    }
+    minutes = split[1];
+    return hours + ':' + minutes + ' ' + am_pm;
+}
+
+function fixQuotationMarks(name) {
+    return name.replace(/\"/g, '\'');
+}
+
+/*
+             ____
+              ---|
+  \/            /|     \/
+               / |\
+              /  | \        \/
+             /   || \
+            /    | | \
+           /     | |  \
+          /      | |   \
+         /       ||     \
+        /        /       \
+       /________/         \
+       ________/__________--/
+       \___________________/
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\~~~\
+                                |###|
+                                |###|
+                                |###|
+                                                  
+You've traveled far, programmer. It appears you've reached the end of this document.
+
+*/
