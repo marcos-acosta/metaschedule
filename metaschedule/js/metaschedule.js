@@ -1,14 +1,17 @@
 /* Global variables */
-var course_data;
-var stump_data;
-var selectedCourses = [];
-var course_keys;
-var search_data;
-var search_data_keys;
+var section_to_data;
+var section_to_data_keys;
+
+var selected_courses = [];
+
+var stump_to_data;
+
+var queries;
+
 var pending_course;
-var meta = [];
 var current = 0;
-var nonConflicts;
+
+var non_conflicts;
 
 /* JQUERY */
 $(document).ready(function(){
@@ -37,17 +40,17 @@ $(document).ready(function(){
         if (query == '') {
             $("#searchResults").replaceWith('<div id="searchResults"></div>');
         } else {
-            let results = searchStrings(query, search_data_keys);
+            let results = searchStrings(query, queries);
             let cards = constructSearchCards(results, 15);
             $("#searchResults").replaceWith(cards);
         }
     });
     $("#resultsContainer, #selectedContainer, #filterContainer").on("click", ".card", function(){
-        let name = $(this).attr("data-id");
-        let info = constructCourseData(nameToStump(name));
+        let stump = $(this).attr("data-id");
+        let info = constructCourseData(stump);
         $("#courseInfo").replaceWith(info);
     });
-    $("#scheduleBody").on("click", ".box", function(){
+    $("#scheduleBody").on("click", ".box", function(){  /* COME BACK */
         let code = $(this).attr("data-id");
         let info = constructCourseData(code.split('-')[0]);
         $("#courseInfo").replaceWith(info);
@@ -55,23 +58,24 @@ $(document).ready(function(){
     /* Add a course to your cart */
     $("#resultsContainer").on("click", "#addCourseButton", function(e){
         e.stopPropagation();
-        let code = $(this).attr("data-id");
-        let seats = getSeatsFilled(nameToStump(code));
-        if (!seats[2]) {
-            pending_course = code;
-            $("#fullModal").modal('show');
-        } else {
-            addCourse(code);
-        }
+        let stump = $(this).attr("data-id");
+        // let seats = getSeatsFilled(stump);
+        // if (!seats[2]) {
+        //     pending_course = code;
+        //     $("#fullModal").modal('show');
+        // } else {
+        //     addCourse(code);
+        // }
+        addCourse(stump);
     });
     /* Remove a course from your cart */
     $("#selectedContainer").on("click", "#removeCourseButton", function(e){
         e.stopPropagation();
-        let code = $(this).attr("data-id");
-        removeItemOnce(selectedCourses, code);
+        let stump = $(this).attr("data-id");
+        removeItemOnce(selected_courses, stump);
         updateCourseList();
         updateScheduleDiv();
-        if (selectedCourses.length == 0) {
+        if (selected_courses.length == 0) {
             $("#generateButton").attr('disabled', true);
             $("#generateButton").css('cursor', 'initial');
         }
@@ -97,16 +101,16 @@ $(document).ready(function(){
         $("#helpModal").modal('show');
     });
     $("#scheduleContainer").on("change", "#sectionPicker", function() {
-        selectedCourses[$(this).attr('data-id')]["filteredSections"] = $(this).val();
+        selected_courses[$(this).attr('data-id')]["filteredSections"] = $(this).val();
     });
     $("#generateButton").click(function() {
         $("#scheduleCard").slideUp("fast", "swing", function() {
             $("#info").remove();
-            nonConflicts = getAllSchedules();
-            console.log('Permutations:', nonConflicts);
+            non_conflicts = getAllSchedules();
+            console.log('Permutations:', non_conflicts);
             current = 0;
             updateButtons();
-            if (nonConflicts.length == 0) {
+            if (non_conflicts.length == 0) {
                 $("#wholeScheduleContainer").hide();
                 $("#noPerms").show();
             } else {
@@ -134,19 +138,19 @@ $(document).ready(function(){
 
 function generate() {
     $(".box").remove();
-    let html = getFullSchedule(nonConflicts[current]);
-    let availability = getLowestAvailability(nonConflicts[current]);
+    let html = getFullSchedule(non_conflicts[current]);
+    let availability = getLowestAvailability(non_conflicts[current]);
     $("#countNumber").html(getNumberPermutations());
-    $("#classes").html(generateCourseCards(nonConflicts[current]));
+    $("#classes").html(generateCourseCards(non_conflicts[current]));
     $("#score").html(availability[2]);
-    $("#page").html((current + 1) + '/' + nonConflicts.length);
+    $("#page").html((current + 1) + '/' + non_conflicts.length);
     $("#actualScore").html(availability[0] + '/' + availability[1]);
     $("#availability").css('border-color', availability[3]);
     $("#realDeal").append(html);
 }
 
 function getNumberPermutations() {
-    let num = nonConflicts.length;
+    let num = non_conflicts.length;
     if (num == 1) {
         return '1 permutation';
     } else {
@@ -166,7 +170,7 @@ function updateButtons() {
         $("#previous").addClass('btn-outline-primary');
         $("#previous").css('cursor', 'pointer');
     }
-    if (current >= nonConflicts.length - 1) {
+    if (current >= non_conflicts.length - 1) {
         $("#next").attr('disabled', true);
         $("#next").removeClass('btn-outline-primary');
         $("#next").addClass('btn-outline-secondary');
@@ -179,37 +183,40 @@ function updateButtons() {
     }
 }
 
-function addCourse(name) {
-    selectedCourses.push(getOpenSections(name));
+function addCourse(stump) {
+    selected_courses.push(getOpenSections(stump));
     updateCourseList();
     updateScheduleDiv();
     $("#generateButton").attr('disabled', false);
     $("#generateButton").css('cursor', 'pointer');
 }
 
-function getOpenSections(name) {
-    let sections = stump_data[nameToStump(name)]["sections"];
+function getOpenSections(stump) {
+    let sections = stump_to_data[stump]["sections"];
     let open = [];
     for (let i = 0; i < sections.length; i++) {
-        if (course_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
+        if (section_to_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
             open.push(sections[i]);
         }
     }
+    let course_name = stump_to_data[stump]["name"];
     return {
-        name: name,
+        name: course_name,
+        stump: stump,
         openSections: open,
-        filteredSections: []
+        filteredSections: [],
+        query: stump + ' ' + course_name
     };
 }
 
 function collectData(all_data) {
-    course_data = all_data['data']['courses'];
-    course_keys = Object.keys(course_data);
+    section_to_data = all_data['data']['courses'];
+    section_to_data_keys = Object.keys(section_to_data);
     console.log('Got course data');
     generateStumps();
     console.log('Instantiated stump data');
-    generateSearches();
-    console.log('Instantiated searches');
+    generateQueries();
+    console.log('Instantiated queries');
     $('#courseSearch').prop("disabled", false);
 }
 
@@ -238,22 +245,22 @@ function constructSearchCards(results, cap) {
     let coursesAdded = 0;
     let cardsHtml = '<div id="searchResults">';
     for (let i = 0; i < results.length; i++) {
+        let stump = nameToStump(results[i]);
         let color = '';
         let add = '';
-        // if (selectedCourses.includes(results[i])) {
-        if (dictionaryIncludes(selectedCourses, results[i])) {
+        let seats = getSeatsFilled(stump);
+        if (dictionaryIncludes(selected_courses, results[i])) {
             continue;
         }
-        let seats = getSeatsFilled(nameToStump(results[i]));
         if (!seats[2]) {
             color = "grayCard";
             add = "";
         } else {
             color = getColor(results[i]);
-            add = '<button type="button" class="close float-right" id="addCourseButton" data-id="' + results[i] + '"><span aria-hidden="true" style="color: white;">+</span></button>';
+            add = '<button type="button" class="close float-right" id="addCourseButton" data-id="' + stump + '"><span aria-hidden="true" style="color: white;">+</span></button>';
         }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
-        cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + results[i] + 
+        cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + stump + 
                         '" id="addCard" style="overflow:hidden; border-color: rgba(255, 0, 0, 0); cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
                         results[i] + ' ' + formattedSeats + add + '</div></div>';
         coursesAdded++;
@@ -268,35 +275,36 @@ function constructSearchCards(results, cap) {
 /* Constructs HTML for selected course cards */
 function constructSelectedCards() {
     let cardsHtml = '<div id="courseList">';
-    for (let i = 0; i < selectedCourses.length; i++) {
-        let name = selectedCourses[i]["name"];
-        let seats = getSeatsFilled(nameToStump(name));
+    for (let i = 0; i < selected_courses.length; i++) {
+        let name = selected_courses[i]["query"];
+        let stump = selected_courses[i]["stump"];
+        let seats = getSeatsFilled(stump);
         let color = getColorOrGray(name, seats);
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + 
-                        name + '" id="removeCard" style="height: 90px; border-color: rgba(255, 0, 0, 0); cursor: pointer; overflow: hidden;"><div class="card-body">' + name + ' ' + 
-                        formattedSeats + '<button style="position: absolute; top: 15px; right: 15px;" type="button" class="close" id="removeCourseButton" data-id="' + 
-                        name + '"> <span aria-hidden="true" style="color: white;">&times;</span></button></div></div>';
+                        stump + '" id="removeCard" style="height: 85px; border-color: rgba(255, 0, 0, 0); cursor: pointer; overflow: hidden;"><button style="position: absolute; top: 15px; right: 15px;" type="button" class="close" id="removeCourseButton" data-id="' + 
+                        stump + '"><span aria-hidden="true" style="color: white;">&times;</span></button><div class="card-body p-3 pr-5">' + name + ' ' + 
+                        formattedSeats + '</div></div>';
     }
     return cardsHtml + '</div>';
 }
 
 function constructCourseData(stump) {
-    let sections = stump_data[stump]["sections"];
-    let credits = course_data[sections[0]]['courseCredits'];
+    let sections = stump_to_data[stump]["sections"];
+    let credits = section_to_data[sections[0]]['courseCredits'];
     let description;
-    if (course_data[sections[0]]['courseDescription'] == null) {
+    if (section_to_data[sections[0]]['courseDescription'] == null) {
         description = "No course description";
     } else {
-        description = '<b>(' + credits + ' credits) </b>' + course_data[sections[0]]['courseDescription'];
+        description = '<b>(' + credits + ' credits) </b>' + section_to_data[sections[0]]['courseDescription'];
     }
     let infoHtml = '<div id="courseInfo">';
-    infoHtml += '<h5>' + stump + ' | ' + course_data[sections[0]]["courseName"] + '</h5><hr><span style="font-size: 14px;">';
+    infoHtml += '<h5>' + stump + ' | ' + section_to_data[sections[0]]["courseName"] + '</h5><hr><span style="font-size: 14px;">';
     infoHtml += description;
     infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
     for (let i = 0; i < sections.length; i++) {
         let seats = getSectionSeatsFilled(sections[i]);
-        let courseStatus = course_data[sections[i]]["courseEnrollmentStatus"];
+        let courseStatus = section_to_data[sections[i]]["courseEnrollmentStatus"];
         let color = getColorFromSeats(seats, courseStatus);
         infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + '; border-width: 2px;"><div class="card-header p-2">' + sections[i] + ' (' + 
                     seats[0] + '/' + seats[1] + ') <span class="text-muted">' + courseStatus + '</span><div class="specialCircle float-right" style="background-color: ' + color + ';"></div></div><div class="card-body p-2 pb-1">' + 
@@ -314,13 +322,14 @@ function updateCourseList() {
 }
 
 function getFilterHtml(i) {
-    let name = selectedCourses[i]["name"];
-    let seats = getSeatsFilled(nameToStump(name));
+    let name = selected_courses[i]["query"];
+    let stump = selected_courses[i]["stump"];
+    let seats = getSeatsFilled(stump);
     let color = getColorOrGray(name, seats);
     let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0); cursor: pointer;" data-id="' + 
-                name + '"><div class="card-body p-2"><div class="ml-2" style="position: absolute; top: 15px; width: 67%;">' + name + 
+                stump + '"><div class="card-body p-2"><div class="ml-2" style="position: absolute; top: 15px; width: 67%;">' + name + 
                 '</div><select class="selectpicker float-right mt-0" data-width="28%" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
-    let sections = selectedCourses[i]["openSections"];
+    let sections = selected_courses[i]["openSections"];
     sections.forEach(function(section) {
         html += '<option>' + section + '</option>';
     });
@@ -329,11 +338,11 @@ function getFilterHtml(i) {
 
 function updateScheduleDiv() {
     let html = '';
-    for (let i = 0; i < selectedCourses.length; i++) {
+    for (let i = 0; i < selected_courses.length; i++) {
         html += getFilterHtml(i);
     }
     $("#filterContainer").html(html);
-    for (let i = 0; i < selectedCourses.length; i++) {
+    for (let i = 0; i < selected_courses.length; i++) {
         $("[id='sectionPicker'][data-id='" + i + "']").selectpicker('refresh');
     }
 }
@@ -348,7 +357,7 @@ function removeItemOnce(dicts, value) {
 
 function dictionaryIndexOf(dicts, key) {
     for (let i = 0; i < dicts.length; i++) {
-        if (dicts[i]['name'] == key) {
+        if (dicts[i]['stump'] == key) {
             return i;
         }
     }
@@ -357,18 +366,27 @@ function dictionaryIndexOf(dicts, key) {
 
 function dictionaryIncludes(dicts, key) {
     for (let i = 0; i < dicts.length; i++) {
-        if (dicts[i]['name'] == key) {
+        if (dicts[i]["query"] == key) {
             return true;
         }
     }
     return false;
 }
 
+function getMatchingDictionary(dicts, key, value) {
+    for (let i = 0; i < dicts.length; i++) {
+        if (dicts[i][key] == value) {
+            return dicts[i];
+        }
+    }
+    return;
+}
+
 /* Get total credits of selected courses */
 function getCreditTotal() {
     let count = 0.0;
-    for (let i = 0; i < selectedCourses.length; i++) {
-        count += parseFloat(search_data[selectedCourses[i]["name"]]["credits"]);
+    for (let i = 0; i < selected_courses.length; i++) {
+        count += parseFloat(stump_to_data[selected_courses[i]["stump"]]["credits"]);
     }
     return count;
 }
@@ -399,45 +417,44 @@ function nameToStump(name) {
 
 /* Generate mapping of stumps to sections */
 function generateStumps() {
-    stump_data = {};
-    for (let i = 0; i < course_keys.length; i++) {
-        let stump = stumpify(course_keys[i]);
+    stump_to_data = {};
+    for (let i = 0; i < section_to_data_keys.length; i++) {
+        let stump = stumpify(section_to_data_keys[i]);
         // Already have this stump
-        if (stump_data.hasOwnProperty(stump)) {
+        if (stump_to_data.hasOwnProperty(stump)) {
             // Just add this section
-            stump_data[stump]["sections"].push(course_keys[i]);
+            stump_to_data[stump]["sections"].push(section_to_data_keys[i]);
         } else {
+            let course = section_to_data[[section_to_data_keys[i]][0]];
             // Instantiate it!
-            stump_data[stump] = {
-                sections: [course_keys[i]]
-            };
+            stump_to_data[stump] = {
+                sections: [section_to_data_keys[i]],
+                name: course["courseName"],
+                credits: course["courseCredits"]
+            }
         }
     }
 }
 
 /* Generate mapping of stump+name to stump */
-function generateSearches() {
-    search_data = {};
-    stump_keys = Object.keys(stump_data)
+function generateQueries() {
+    queries = [];
+    stump_keys = Object.keys(stump_to_data);
     for (let i = 0; i < stump_keys.length; i++) {
-        let course = course_data[stump_data[stump_keys[i]]["sections"][0]];
-        search_data[stump_keys[i] + ' ' + fixQuotationMarks(course['courseName'])] = {
-            "stump": stump_keys[i],
-            "credits": course['courseCredits']
-        }
+        let course = section_to_data[stump_to_data[stump_keys[i]]["sections"][0]];
+        queries.push(stump_keys[i] + ' ' + course['courseName']);
     }
-    search_data_keys = Object.keys(search_data);
 }
 
 function getSeatsFilled(stump) {
-    let sections = stump_data[stump]["sections"];
+    let sections = stump_to_data[stump]["sections"];
     let seatsFilled = 0;
     let seatsTotal = 0;
     let anyAvailable = false;
     for (let i = 0; i < sections.length; i++) {
-        seatsFilled += course_data[sections[i]]["courseSeatsFilled"];
-        seatsTotal += course_data[sections[i]]["courseSeatsTotal"];
-        if (course_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
+        seatsFilled += section_to_data[sections[i]]["courseSeatsFilled"];
+        seatsTotal += section_to_data[sections[i]]["courseSeatsTotal"];
+        if (section_to_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
             anyAvailable = true;
         }
     }
@@ -445,7 +462,7 @@ function getSeatsFilled(stump) {
 }
 
 function getSectionSeatsFilled(code) {
-    let course = course_data[code];
+    let course = section_to_data[code];
     return [course['courseSeatsFilled'], course['courseSeatsTotal']];
 }
 
@@ -465,7 +482,7 @@ function getColorFromSeats(seats, enrollmentStatus) {
 }
 
 function formatProfs(code) {
-    let profs = course_data[code]['courseInstructors'];
+    let profs = section_to_data[code]['courseInstructors'];
     if (profs.length == 0) {
         return 'No professor data';
     } else if (profs.length == 1) {
@@ -504,14 +521,14 @@ function permute(courseList) {
 }
 
 function getAllSchedules() {
-    let permutations = permute(selectedCourses);
-    let nonConflicts = [];
+    let permutations = permute(selected_courses);
+    let non_conflicts = [];
     permutations.forEach(function(permutation) {
         if (!proposedScheduleConflict(permutation)) {
-            nonConflicts.push(permutation);
+            non_conflicts.push(permutation);
         }
     });
-    return nonConflicts;
+    return non_conflicts;
 }
 
 function proposedScheduleConflict(sections) {
@@ -526,8 +543,8 @@ function proposedScheduleConflict(sections) {
 }
 
 function sectionsConflict(section1, section2) {
-    let schedules1 = course_data[section1]["courseSchedule"];
-    let schedules2 = course_data[section2]["courseSchedule"];
+    let schedules1 = section_to_data[section1]["courseSchedule"];
+    let schedules2 = section_to_data[section2]["courseSchedule"];
     for (let i = 0; i < schedules1.length; i++) {
         for (let j = 0; j < schedules2.length; j++) {
             if (schedulesConflict(schedules1[i], schedules2[j])) {
@@ -587,8 +604,8 @@ function getFullSchedule(sections) {
 
 function getCalendarEvent(section) {
     let color = getColor(section);
-    let schedules = course_data[section]["courseSchedule"];
-    let name = course_data[section]["courseName"];
+    let schedules = section_to_data[section]["courseSchedule"];
+    let name = section_to_data[section]["courseName"];
     let html = '';
     let seats = getSectionSeatsFilled(section);
     for (let i = 0; i < schedules.length; i++) {
@@ -640,7 +657,7 @@ function getColorFromAvailability(percent) {
 }
 
 function sortByAvailability() {
-    nonConflicts.sort(function(x, y) {
+    non_conflicts.sort(function(x, y) {
         let xa = getLowestAvailability(x)[2];
         let ya = getLowestAvailability(y)[2];
         if (xa == ya) {
@@ -658,12 +675,11 @@ function generateCourseCards(sections) {
     sections.forEach(function(section) {
         html += '<div class="card ml-1 mr-1 p-2 ' + getColor(section) + '" style="display: inline-block;">' + section + '</div>';
     });
-    console.log(html);
     return html;
 }
 
 function getTimePlace(section) {
-    let schedules = course_data[section]["courseSchedule"];
+    let schedules = section_to_data[section]["courseSchedule"];
     let html = '';
     for (let i = 0; i < schedules.length; i++) {
         let days = schedules[i]["scheduleDays"];
@@ -718,6 +734,6 @@ function fixQuotationMarks(name) {
                                 |###|
                                 |###|
                                                   
-You've traveled far, programmer. It appears you've reached the end of this document.
+You've traveled far, programmer. It appears you've reached the end of this file.
 
 */
