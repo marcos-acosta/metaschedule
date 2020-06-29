@@ -7,7 +7,7 @@ var section_to_data_keys;
 // List of dictionaries containing selected stumps, available sections, etc
 var selected_courses = [];
 
-// Links a stump to sections, name, and credits
+// Links a stump to data
 var stump_to_data;
 
 // A list of searchable stumps (stump + name)
@@ -57,27 +57,29 @@ $(document).ready(function(){
         $("#courseInfo").html(info);
     });
     /* Get section info by clicking on a schedule box */
-    $("#scheduleBody").on("click", ".box", function(){  /* COME BACK */
-        let code = $(this).attr("data-id");
-        let info = constructCourseData(code.split('-')[0]);
-        $("#courseInfo").replaceWith(info);
+    $("#scheduleBody").on("click", ".box", function(){
+        // Update course info card
+        let stump = $(this).attr("data-id");
+        let info = constructCourseData(stump.split('-')[0]);
+        $("#courseInfo").html(info);
+        // Popup specific section info
     });
     /* Add a course to your cart */
-    $("#resultsContainer").on("click", "#addCourseButton", function(e){
+    $("#resultsContainer").on("click", "#addCourseButton", function(e) {
         e.stopPropagation();
         let stump = $(this).attr("data-id");
         addCourse(stump);
+        activateGenerateButton();
     });
     /* Remove a course from your cart */
-    $("#selectedContainer").on("click", "#removeCourseButton", function(e){
+    $("#selectedContainer").on("click", "#removeCourseButton", function(e) {
         e.stopPropagation();
         let stump = $(this).attr("data-id");
         removeItemOnce(selected_courses, 'stump', stump);
         updateCourseList();
         updateFilters();
         if (selected_courses.length == 0) {
-            $("#generateButton").attr('disabled', true);
-            $("#generateButton").css('cursor', 'initial');
+            deactivateGenerateButton();
         }
     });
     /* Refresh data - TO BE CHANGED */
@@ -95,6 +97,10 @@ $(document).ready(function(){
     $("#filterInfoButton").click(function() {
         $("#filterInfoModal").modal('show');
     });
+    /* Learn about schedules */
+    $("#scheduleInfoButton").click(function() {
+        $("#scheduleInfoModal").modal('show');
+    });
     /* Learn the basics */
     $("#help").click(function() {
         $("#helpModal").modal('show');
@@ -102,6 +108,7 @@ $(document).ready(function(){
     /* Update filters */
     $("#scheduleContainer").on("change", "#sectionPicker", function() {
         selected_courses[$(this).attr('data-id')]["filteredSections"] = $(this).val();
+        activateGenerateButton();
     });
     /* Generate schedules */
     $("#generateButton").click(function() {
@@ -122,6 +129,7 @@ $(document).ready(function(){
                 $("#noPerms").hide();
                 generate();
             }
+            deactivateGenerateButton();
             $("#scheduleCard").slideDown("fast", "swing");
         });
     });
@@ -205,7 +213,7 @@ function addCourse(stump) {
     selected_courses.push(getCourseDict(stump));
     updateCourseList();
     updateFilters();
-    activateGenerateButton();
+    console.log(selected_courses);
 }
 
 /* Make generate button visually clickable */
@@ -230,7 +238,7 @@ function getCourseDict(stump) {
             open.push(sections[i]);
         }
     }
-    let course_name = stump_to_data[stump]["name"];
+    let course_name = stump_to_data[stump]["data"]["courseName"];
     // Consolidate data
     return {
         name: course_name,
@@ -340,16 +348,20 @@ function constructCourseData(stump) {
     infoHtml += description;
     infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
     for (let i = 0; i < sections.length; i++) {
-        let seats = getSectionSeatsFilled(sections[i]);
-        let courseStatus = section_to_data[sections[i]]["courseEnrollmentStatus"];
-        let color = getColorFromSeats(seats, courseStatus);
-        infoHtml += '<div class="card mb-2 bg-light" style="border-color: ' + color + '; border-width: 2px;">' + 
-                    '<div class="card-header p-2">' + sections[i] + ' (' + seats[0] + '/' + seats[1] + ') <span' + 
-                    'class="text-muted">' + courseStatus + '</span><div class="specialCircle float-right" ' + 
-                    'style="background-color: ' + color + ';"></div></div><div class="card-body p-2 pb-1">' + 
-                    formatProfs(sections[i]) + '<br><ul>' + getTimePlace(sections[i]) + '</ul></div></div>';
+        infoHtml += getSectionInfo(sections[i]);
     }
     return infoHtml;
+}
+
+function getSectionInfo(section) {
+    let seats = getSectionSeatsFilled(section);
+    let courseStatus = section_to_data[section]["courseEnrollmentStatus"];
+    let color = getColorFromSeats(seats, courseStatus);
+    return  '<div class="card mb-2 bg-light" style="border-color: ' + color + '; border-width: 2px;">' + 
+            '<div class="card-header p-2">' + section + ' (' + seats[0] + '/' + seats[1] + ') <span' + 
+            'class="text-muted">' + courseStatus + '</span><div class="specialCircle float-right" ' + 
+            'style="background-color: ' + color + ';"></div></div><div class="card-body p-2 pb-1">' + 
+            formatProfs(section) + '<br><ul>' + getTimePlace(section) + '</ul></div></div>';
 }
 
 /* Update course list */
@@ -364,6 +376,7 @@ function updateCourseList() {
 function getFilterHtml(i) {
     let name = selected_courses[i]["query"];
     let stump = selected_courses[i]["stump"];
+    let selected;
     let color = getColor(name);
     let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);' + 
                 'cursor: pointer;" data-id="' + stump + '"><div class="card-body p-2"><div class="ml-2" style="position:' + 
@@ -371,7 +384,13 @@ function getFilterHtml(i) {
                 'data-width="28%" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
     let sections = selected_courses[i]["openSections"];
     sections.forEach(function(section) {
-        html += '<option>' + section + '</option>';
+        // Add filters back in, if they existed
+        if (arrayIncludes(selected_courses[i]["filteredSections"], section)) {
+            selected = 'selected';
+        } else {
+            selected = '';
+        }
+        html += '<option ' + selected + '>' + section + '</option>';
     });
     return html + '</select></div></div>';
 }
@@ -418,11 +437,25 @@ function dictionaryIncludes(dicts, key, value) {
     return false;
 }
 
+/* Determine if an array has a value */
+function arrayIncludes(arr, value) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function mutualExclusionProblem() {
+
+}
+
 /* Get total credits of selected courses */
 function getCreditTotal() {
     let count = 0.0;
     for (let i = 0; i < selected_courses.length; i++) {
-        count += parseFloat(stump_to_data[selected_courses[i]["stump"]]["credits"]);
+        count += parseFloat(stump_to_data[selected_courses[i]["stump"]]["data"]["courseCredits"]);
     }
     return count;
 }
@@ -468,8 +501,7 @@ function generateStumps() {
             // Instantiate it!
             stump_to_data[stump] = {
                 sections: [section_to_data_keys[i]],
-                name: course["courseName"],
-                credits: course["courseCredits"]
+                data: course
             }
         }
     }
@@ -607,7 +639,7 @@ function sectionsConflict(section1, section2) {
 
 /* Determine if two schedules conflict */
 function schedulesConflict(schedule1, schedule2) {
-    if (!daysCoincide(schedule1["scheduleDays"], schedule2["scheduleDays"])) {
+    if (!daysCoincide(schedule1["scheduleDays"], schedule2["scheduleDays"]) || !sameTerms(schedule1, schedule2)) {
         return false;
     } else {
         return timesCoincide(   militaryToMinutes(schedule1["scheduleStartTime"]),
@@ -629,6 +661,22 @@ function daysCoincide(days1, days2) {
         }
     }
     return false;
+}
+
+/* Determine if two schedules occur in different terms */
+function sameTerms(schedule1, schedule2) {
+    let count1 = schedule1["scheduleTermCount"];
+    let count2 = schedule2["scheduleTermCount"];
+    if (count1 == 1 || count2 == 1) {
+        return true;
+    }
+    let terms1 = schedule1["scheduleTerms"];
+    let terms2 = schedule2["scheduleTerms"];
+    if (terms1[0] == terms2[0]) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 /* Determine if two pairs of start and end times conflict */
@@ -681,7 +729,7 @@ function getCalendarEvent(section) {
         for (let i = 0; i < days.length; i++) {
             html += '<div class="box ' + color + '" data-id="' + section + '" style="grid-row: ' + timeToRow(start) + ' / ' + 
                     timeToRow(end) + '; cursor: pointer; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + 
-                    '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + name + '</div>';
+                    '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + name + '<span class="tooltiptext">' + formatProfs(section) + '</span></div>';
         }
     }
     return html;

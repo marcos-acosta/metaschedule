@@ -185,3 +185,23 @@ input.searchBar:disabled {
     text-align: center;
     overflow: hidden;
 }
+
+/* Tooltip text */
+.box .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgba(0, 0, 0, 0.637);
+    color: #fff;
+    text-align: center;
+    padding: 5px;
+    border-radius: 6px;
+
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.box:hover .tooltiptext {
+    visibility: visible;
+}
