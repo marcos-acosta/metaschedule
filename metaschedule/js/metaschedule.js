@@ -19,8 +19,16 @@ var current = 0;
 // All generated non-conflicting schedules
 var non_conflicts;
 
+// Date of last refresh
+var last_refresh_time = Date.now();
+
+// Timer
+var timer;
+
 /* JQUERY */
 $(document).ready(function(){
+    // Set last refreshed timer
+    resetTimer();
     /* Get course data */
     $.getJSON('https://hyperschedule.herokuapp.com/api/v3/courses?school=hmc', function(all_data) {
         collectData(all_data);
@@ -92,16 +100,27 @@ $(document).ready(function(){
             activateGenerateButton();
         }
     });
-    /* Refresh data - TO BE CHANGED */
+    /* Refresh data */
     $("#refresh").click(function() {
         // Loading visuals
         startLoading();
         $.getJSON('https://hyperschedule.herokuapp.com/api/v3/courses?school=hmc', function(all_data) {
             collectData(all_data);
             stopLoading();
+            let changes = updateSelectedCourses();
+            if (changes) {
+                $("#changesMadeModal").modal('show');
+            }
+            updateCourseList();
+            updateFilters();
+            $("#courseInfo").html('');
+            if (selected_courses.length != 0) {
+                $("#generateButton").trigger("click");
+            }
+            deactivateGenerateButton();
+            last_refresh_time = Date.now();
+            resetTimer();
         });
-        updateCourseList();
-        $("#courseInfo").html('');
     });
     /* Learn about filtering */
     $("#filterInfoButton").click(function() {
@@ -197,6 +216,37 @@ function clearModal() {
         $('#' +  id).prop('checked', false);
     });
     $("#error").hide();
+}
+
+/* Updates your selected courses (with new data) */
+function updateSelectedCourses() {
+    let changesMade = false;
+    // Go through selected courses
+    for (let i = 0; i < selected_courses.length; i++) {
+        let course = selected_courses[i];
+        // If not custom
+        if (course["type"] == 'course') {
+            // Update open sections
+            course["openSections"] = getOpenSections(course["stump"]);
+            // This course isn't available anymore
+            if (course["openSections"].length == 0) {
+                removeItemOnce(selected_courses, 'stump', course["stump"], 'course');
+                changesMade = true;
+                i--;
+            } else {
+                let filtered = course["filteredSections"];
+                for (let j = 0; j < filtered.length; j++) {
+                    // This filtered section isn't open anymore
+                    if (!arrayIncludes(course["openSections"], filtered[j])) {
+                        filtered.splice(j, 1);
+                        changesMade = true;
+                        j--;
+                    }
+                }
+            }
+        }
+    }
+    return changesMade;
 }
 
 /* Fully validate days, start time, and end time, returns true if valid, false otherwise */
@@ -310,12 +360,14 @@ function isInteger(value) {
 function startLoading() {
     $('#courseSearch').prop("disabled", true);
     $('#loadingSpinner').show();
+    $('#refreshSpinner').show();
 }
 
 /* Visually indicate that data has been retrieved */
 function stopLoading() {
     $('#courseSearch').prop("disabled", false);
     $('#loadingSpinner').hide();
+    $('#refreshSpinner').hide();
 }
 
 /* Display non-conflicting schedules */
@@ -399,14 +451,7 @@ function deactivateGenerateButton() {
 
 /* Put relevant information from a stump into a dictionary */
 function getCourseDict(stump) {
-    let sections = stump_to_data[stump]["sections"];
-    let open = [];
-    // Add open sections
-    for (let i = 0; i < sections.length; i++) {
-        if (section_to_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
-            open.push(sections[i]);
-        }
-    }
+    let open = getOpenSections(stump);
     let course_name = stump_to_data[stump]["data"]["courseName"];
     // Consolidate data
     return {
@@ -417,6 +462,19 @@ function getCourseDict(stump) {
         filteredSections: [],
         query: stump + ' ' + course_name
     };
+}
+
+/* Gets open sections from stump */
+function getOpenSections(stump) {
+    let sections = stump_to_data[stump]["sections"];
+    let open = [];
+    // Add open sections
+    for (let i = 0; i < sections.length; i++) {
+        if (section_to_data[sections[i]]["courseEnrollmentStatus"] !== 'closed') {
+            open.push(sections[i]);
+        }
+    }
+    return open;
 }
 
 /* Fetch data and construct necessary objects */
@@ -1087,6 +1145,40 @@ function militaryToRegular(military) {
     }
     minutes = split[1];
     return hours + ':' + minutes + ' ' + am_pm;
+}
+
+/* Borrowed from Stack Overflow, I'll give it back later */
+function timeSince(date) {
+    let seconds = Math.floor((new Date() - date) / 1000);
+    let interval = Math.floor(seconds / 31536000);
+    if (interval > 1) {
+        return interval + " years";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {
+        return interval + " months";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {
+        return interval + " days";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {
+        return interval + " hours";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {
+        return interval + " minutes";
+    }
+    return Math.floor(seconds) + " seconds";
+}
+
+function resetTimer() {
+    clearInterval(timer);
+    $("#lastRefresh").html('Refreshed just now');
+    timer = setInterval(function() {
+        $("#lastRefresh").html(timeSince(last_refresh_time) + ' since last refresh');
+    }, 10 * 1000); // 10 * 1000 milsec
 }
 
 /*

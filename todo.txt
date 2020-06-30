@@ -4,5 +4,4 @@ OPERATION HYDRA
 - Netlify
 
 OPERATION TITAN
-- Refreshing
 - Display time since last refresh
