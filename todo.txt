@@ -6,6 +6,3 @@ OPERATION HYDRA
 OPERATION TITAN
 - Refreshing
 - Display time since last refresh
-
-MISC
-- add time commitments

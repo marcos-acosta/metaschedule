@@ -43,7 +43,7 @@ $(document).ready(function(){
     $("#courseSearch").keyup(function(){
         let query = cleanQuery($("#courseSearch").val().toLowerCase());
         if (query == '') {
-            $("#searchResults").replaceWith('<div id="searchResults"></div>');
+            $("#searchResults").html('');
         } else {
             let results = searchStrings(query, queries);
             let cards = constructSearchCards(results, 15);
@@ -60,9 +60,13 @@ $(document).ready(function(){
     $("#scheduleBody").on("click", ".box", function(){
         // Update course info card
         let stump = $(this).attr("data-id");
-        let info = constructCourseData(stump.split('-')[0]);
+        let info;
+        if (isCustom(stump)) {
+            info = constructCourseData(stump);
+        } else {
+            info = constructCourseData(stump.split('-')[0]);
+        }
         $("#courseInfo").html(info);
-        // Popup specific section info
     });
     /* Add a course to your cart */
     $("#resultsContainer").on("click", "#addCourseButton", function(e) {
@@ -75,11 +79,17 @@ $(document).ready(function(){
     $("#selectedContainer").on("click", "#removeCourseButton", function(e) {
         e.stopPropagation();
         let stump = $(this).attr("data-id");
-        removeItemOnce(selected_courses, 'stump', stump);
+        if (isCustom(stump)) {
+            removeItemOnce(selected_courses, 'name', stump.substring(7), 'custom');
+        } else {
+            removeItemOnce(selected_courses, 'stump', stump, 'course');
+        }
         updateCourseList();
         updateFilters();
         if (selected_courses.length == 0) {
             deactivateGenerateButton();
+        } else {
+            activateGenerateButton();
         }
     });
     /* Refresh data - TO BE CHANGED */
@@ -116,7 +126,6 @@ $(document).ready(function(){
             $("#info").remove();
             // Generate schedules
             non_conflicts = getAllSchedules();
-            console.log('Permutations:', non_conflicts);
             current = 0;
             updateButtons();
             // No schedules possible
@@ -143,7 +152,159 @@ $(document).ready(function(){
         generate();
         updateButtons();
     });
+    $("#addCustom").click(function() {
+        $("#formModal").modal('show');
+    });
+    $("#addCustomFinal").click(function() {
+        let c_name = $("#commitmentName").val();
+        let c_days = getDaysFromForm();
+        let c_start = validateTime($("#startTime").val());
+        let c_end = validateTime($("#endTime").val());
+        let valid = validate(c_name, c_days, c_start, c_end);
+        if (valid) {
+            let custom = {
+                type: 'custom',
+                name: c_name,
+                courseSchedule: [
+                    {
+                        scheduleDays: c_days,
+                        scheduleStartTime: c_start,
+                        scheduleEndTime: c_end,
+                        scheduleTermCount: 1,
+                        scheduleTerms: [0]
+                    }
+                ]
+            }
+            addCustom(custom);
+            clearModal();
+            $("#formModal").modal('hide');
+            activateGenerateButton();
+        }
+    });
+    $("#cancelCustom, #closeCustom").click(function() {
+        clearModal();
+        $("#formModal").modal('hide');
+    });
 });
+
+/* Clears custom commitment modal */
+function clearModal() {
+    let dayIds = ['mondayCheck', 'tuesdayCheck', 'wednesdayCheck', 'thursdayCheck', 'fridayCheck'];
+    $("#commitmentName").val('');
+    $("#startTime").val('');
+    $("#endTime").val('');
+    dayIds.forEach(function(id) {
+        $('#' +  id).prop('checked', false);
+    });
+    $("#error").hide();
+}
+
+/* Fully validate days, start time, and end time, returns true if valid, false otherwise */
+function validate(name, days, start, end) {
+    // Empty name
+    if (name == '') {
+        $("#error").html('ERR: Please give a name to this commitment.');
+        $("#error").show();
+    }
+    // Name already used
+    if (dictionaryIncludes(selected_courses, 'name', name, 'custom')) {
+        $("#error").html('ERR: It looks like you already used this name.');
+        $("#error").show();
+    }
+    // No days selected
+    else if (days == '') {
+        $("#error").html('ERR: You must select at least one weekday.');
+        $("#error").show();
+    }
+    // Time error
+    else if (start.charAt(0) == 'E' || end.charAt(0) == 'E') {
+        let err;
+        if (start.charAt(0) == 'E') {
+            err = start;
+        } else {
+            err = end;
+        }
+        $("#error").html(err);
+        $("#error").show();
+    }
+    // Times flipped
+    else if (militaryToMinutes(start) >= militaryToMinutes(end)) {
+        $("#error").html('ERR: It looks like your start time is later than your end time.');
+        $("#error").show();
+    }
+    // All good
+    else {
+        return true;
+    }
+    return false;
+}
+
+/* Get custom days */
+function getDaysFromForm() {
+    let dayIds = ['mondayCheck', 'tuesdayCheck', 'wednesdayCheck', 'thursdayCheck', 'fridayCheck'];
+    let dayNames = ['M', 'T', 'W', 'R', 'F'];
+    let days = '';
+    for (let i = 0; i < dayIds.length; i++) {
+        if ($('#' + dayIds[i]).prop('checked')) {
+            days += dayNames[i];
+        }
+    }
+    return days;
+}
+
+/* Deal with potential user shenanigans */
+function validateTime(time) {
+    if (time.indexOf(':') == -1) {
+        return 'ERR: Times must contain a colon (:).';
+    }
+    if (time.split(':').length > 2) {
+        return 'ERR: Too many colons.';
+    }
+    if (time.split(':')[1].length < 3) {
+        return 'ERR: Invalid time.';
+    }
+    // Hours is whatever comes before the colon
+    let hours = time.split(':')[0];
+    // Minutes is the first two characters after the colon
+    let minutes = time.split(':')[1].substring(0, 2);
+    // AM or PM is whatever's left
+    let am_pm = $.trim(time.split(':')[1].substring(2));
+    // If hours or minutes can't be converted
+    if (!isInteger(hours) || !isInteger(minutes)) {
+        return 'ERR: Invalid time';
+    }
+    let h = parseInt(hours);
+    let m = parseInt(minutes);
+    // Normalize am and pm
+    let a = am_pm.toLowerCase();
+    if (a == 'a') {
+        a = 'am';
+    } else if (a == 'p') {
+        a = 'pm';
+    }
+    // Totally wrong hour or minute values
+    if (h < 1 || h > 12 || m < 0 || m > 59) {
+        return 'ERR: Invalid time';
+    }
+    // Still can't guess am or pm
+    if (a != 'am' && a != 'pm') {
+        return 'ERR: Couldn\'t parse AM or PM.';
+    }
+    // If before 8am, is 12am, or 11pm, out of bounds
+    if ((a == 'am' && h < 8) || (a == 'pm' && h == 11) || (a == 'am' && h == 12)) {
+        return 'ERR: Time should be between 8:00 AM and 10:59 PM.';
+    }
+    if (a == 'am' || a == 'pm' && h == 12) {
+        return h + ':' + minutes;
+    } else {
+        return (h + 12) + ':' + minutes;
+    }
+}
+
+/* Determines if a value could be converted to an int */
+function isInteger(value) {
+    return /^\d+$/.test(value);
+}
 
 /* Visually indicate that data is being retrieved */
 function startLoading() {
@@ -213,7 +374,15 @@ function addCourse(stump) {
     selected_courses.push(getCourseDict(stump));
     updateCourseList();
     updateFilters();
-    console.log(selected_courses);
+    console.log('Selected courses:', selected_courses);
+}
+
+/* Adds a custom commitment and updates everything */
+function addCustom(custom) {
+    selected_courses.push(custom);
+    updateCourseList();
+    updateFilters();
+    console.log('Selected courses:', selected_courses);
 }
 
 /* Make generate button visually clickable */
@@ -241,6 +410,7 @@ function getCourseDict(stump) {
     let course_name = stump_to_data[stump]["data"]["courseName"];
     // Consolidate data
     return {
+        type: 'course',
         name: course_name,
         stump: stump,
         openSections: open,
@@ -293,7 +463,7 @@ function constructSearchCards(results, cap) {
         let seats = getSeatsFilled(stump);
         let color = getColorOrGray(results[i], seats);
         // Already added this course, so skip
-        if (dictionaryIncludes(selected_courses, "query", results[i])) {
+        if (dictionaryIncludes(selected_courses, "query", results[i], 'course')) {
             continue;
         }
         // Add button or no?
@@ -305,7 +475,7 @@ function constructSearchCards(results, cap) {
         }
         let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
         cardsHtml +=    '<div class="card '+ color +' mb-1" data-id="' + stump + '" id="addCard" style="overflow:hidden;' + 
-                        'border-color: rgba(255, 0, 0, 0); cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
+                        'cursor: pointer; height:42px;"><div class="card-body p-2 ml-2">' + 
                         results[i] + ' ' + formattedSeats + add + '</div></div>';
         coursesAdded++;
         if (coursesAdded == cap) {
@@ -319,40 +489,56 @@ function constructSearchCards(results, cap) {
 function constructSelectedCards() {
     let cardsHtml = '';
     for (let i = 0; i < selected_courses.length; i++) {
-        let name = selected_courses[i]["query"];
-        let stump = selected_courses[i]["stump"];
-        let seats = getSeatsFilled(stump);
-        let color = getColor(name);
-        let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
-        cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + stump + '" id="removeCard" style="height: 85px' + 
-                        'border-color: rgba(255, 0, 0, 0); cursor: pointer; overflow: hidden;"><button style="position:' + 
-                        'absolute; top: 15px; right: 15px;" type="button" class="close" id="removeCourseButton" data-id="' + 
-                        stump + '"><span aria-hidden="true" style="color: white;">&times;</span></button><div ' + 
-                        'class="card-body p-3 pr-5">' + name + ' ' + formattedSeats + '</div></div>';
+        if (selected_courses[i]["type"] == 'custom') {
+            let name = selected_courses[i]["name"];
+            cardsHtml +=    '<div class="card customCard mb-1" data-id="custom-' + name + '" id="removeCard" style="height: 85px' + 
+                            'border-color: rgba(255, 0, 0, 0); cursor: pointer; overflow: hidden;"><button style="position:' + 
+                            'absolute; top: 15px; right: 15px;" type="button" class="close" id="removeCourseButton" data-id="custom-' + 
+                            name + '"><span aria-hidden="true" style="color: white;">&times;</span></button><div ' + 
+                            'class="card-body p-3 pr-5">' + name + '</div></div>';
+        } else {
+            let name = selected_courses[i]["query"];
+            let stump = selected_courses[i]["stump"];
+            let seats = getSeatsFilled(stump);
+            let color = getColor(name);
+            let formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
+            cardsHtml +=    '<div class="card ' + color + ' mb-1" data-id="' + stump + '" id="removeCard" style="height: 85px' + 
+                            'border-color: rgba(255, 0, 0, 0); cursor: pointer; overflow: hidden;"><button style="position:' + 
+                            'absolute; top: 15px; right: 15px;" type="button" class="close" id="removeCourseButton" data-id="' + 
+                            stump + '"><span aria-hidden="true" style="color: white;">&times;</span></button><div ' + 
+                            'class="card-body p-3 pr-5">' + name + ' ' + formattedSeats + '</div></div>';
+        }
     }
     return cardsHtml;
 }
 
 /* Get course info in an easy-to-read way */
 function constructCourseData(stump) {
-    let sections = stump_to_data[stump]["sections"];
-    let credits = section_to_data[sections[0]]['courseCredits'];
-    let description;
-    if (section_to_data[sections[0]]['courseDescription'] == null) {
-        description = "No course description";
-    } else {
-        description = '<b>(' + credits + ' credits) </b>' + section_to_data[sections[0]]['courseDescription'];
-    }
     let infoHtml = '';
-    infoHtml += '<h5>' + stump + ' | ' + section_to_data[sections[0]]["courseName"] + '</h5><hr><span style="font-size: 14px;">';
-    infoHtml += description;
-    infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
-    for (let i = 0; i < sections.length; i++) {
-        infoHtml += getSectionInfo(sections[i]);
+    if (isCustom(stump)) {
+        let custom = dictionaryGet(selected_courses, 'name', stump.substring(7), 'custom');
+        infoHtml += '<h5>Custom commitment | ' + custom["name"] + '</h5><hr><span style="font-size: 14px;">';
+        infoHtml += getCustomTime(custom);
+    } else {
+        let sections = stump_to_data[stump]["sections"];
+        let credits = section_to_data[sections[0]]['courseCredits'];
+        let description;
+        if (section_to_data[sections[0]]['courseDescription'] == null) {
+            description = "No course description";
+        } else {
+            description = '<b>(' + credits + ' credits) </b>' + section_to_data[sections[0]]['courseDescription'];
+        }
+        infoHtml += '<h5>' + stump + ' | ' + section_to_data[sections[0]]["courseName"] + '</h5><hr><span style="font-size: 14px;">';
+        infoHtml += description;
+        infoHtml += '</span><hr><h5>Sections (' + sections.length + ')</h5><p>';
+        for (let i = 0; i < sections.length; i++) {
+            infoHtml += getSectionInfo(sections[i]);
+        }
     }
     return infoHtml;
 }
 
+/* Gets info about a specific section and formats it */
 function getSectionInfo(section) {
     let seats = getSectionSeatsFilled(section);
     let courseStatus = section_to_data[section]["courseEnrollmentStatus"];
@@ -374,25 +560,32 @@ function updateCourseList() {
 
 /* Construct html for filters */
 function getFilterHtml(i) {
-    let name = selected_courses[i]["query"];
-    let stump = selected_courses[i]["stump"];
-    let selected;
-    let color = getColor(name);
-    let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);' + 
-                'cursor: pointer;" data-id="' + stump + '"><div class="card-body p-2"><div class="ml-2" style="position:' + 
-                'absolute; top: 15px; width: 67%;">' + name + '</div><select class="selectpicker float-right mt-0"' + 
-                'data-width="28%" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
-    let sections = selected_courses[i]["openSections"];
-    sections.forEach(function(section) {
-        // Add filters back in, if they existed
-        if (arrayIncludes(selected_courses[i]["filteredSections"], section)) {
-            selected = 'selected';
-        } else {
-            selected = '';
-        }
-        html += '<option ' + selected + '>' + section + '</option>';
-    });
-    return html + '</select></div></div>';
+    if (selected_courses[i]["type"] == 'course') {
+        let name = selected_courses[i]["query"];
+        let stump = selected_courses[i]["stump"];
+        let selected;
+        let color = getColor(name);
+        let html =  '<div class="card ml-2 mr-2 mb-2 ' + color + '" style="height: 55px; border-color: rgba(255, 0, 0, 0);' + 
+                    'cursor: pointer;" data-id="' + stump + '"><div class="card-body p-2"><div class="ml-2" style="position:' + 
+                    'absolute; top: 15px; width: 67%;">' + name + '</div><select class="selectpicker float-right mt-0"' + 
+                    'data-width="28%" multiple id="sectionPicker" title="No filter" data-id="' + i + '">';
+        let sections = selected_courses[i]["openSections"];
+        sections.forEach(function(section) {
+            // Add filters back in, if they existed
+            if (arrayIncludes(selected_courses[i]["filteredSections"], section)) {
+                selected = 'selected';
+            } else {
+                selected = '';
+            }
+            html += '<option ' + selected + '>' + section + '</option>';
+        });
+        return html + '</select></div></div>';
+    } else {
+        let name = selected_courses[i]["name"];
+        return  '<div class="card ml-2 mr-2 mb-2 customCard" style="height: 55px; border-color: rgba(255, 0, 0, 0);' + 
+                'cursor: pointer;" data-id="custom-' + name + '"><div class="card-body p-2"><div class="ml-2" style="position:' + 
+                'absolute; top: 15px; width: 67%;">' + name + '</div></div></div>';
+    }
 }
 
 /* Update filters */
@@ -408,9 +601,9 @@ function updateFilters() {
     }
 }
 
-/* Removes a dictionary from a list given a key and value */
-function removeItemOnce(dicts, key, value) { 
-    let index = dictionaryIndexOf(dicts, key, value);
+/* Removes an item once */
+function removeItemOnce(dicts, key, value, type) {
+    let index = dictionaryIndexOf(dicts, key, value, type);
     if (index > -1) {
         dicts.splice(index, 1);
     }
@@ -418,9 +611,9 @@ function removeItemOnce(dicts, key, value) {
 }
 
 /* Finds the index of a dictionary in a list given a key and value */
-function dictionaryIndexOf(dicts, key, value) {
+function dictionaryIndexOf(dicts, key, value, type) {
     for (let i = 0; i < dicts.length; i++) {
-        if (dicts[i][key] == value) {
+        if (dicts[i]["type"] == type && dicts[i][key] == value) {
             return i;
         }
     }
@@ -428,13 +621,23 @@ function dictionaryIndexOf(dicts, key, value) {
 }
 
 /* Determines if a list of dictionaries includes one given a key and value */
-function dictionaryIncludes(dicts, key, value) {
+function dictionaryIncludes(dicts, key, value, type) {
     for (let i = 0; i < dicts.length; i++) {
-        if (dicts[i][key] == value) {
+        if (dicts[i]["type"] == type && dicts[i][key] == value) {
             return true;
         }
     }
     return false;
+}
+
+/* Retrieves a dictionary from a list of dicts by value */
+function dictionaryGet(dicts, key, value, type) {
+    for (let i = 0; i < dicts.length; i++) {
+        if (dicts[i]["type"] == type && dicts[i][key] == value) {
+            return dicts[i];
+        }
+    }
+    return -1;
 }
 
 /* Determine if an array has a value */
@@ -447,15 +650,13 @@ function arrayIncludes(arr, value) {
     return false;
 }
 
-function mutualExclusionProblem() {
-
-}
-
 /* Get total credits of selected courses */
 function getCreditTotal() {
     let count = 0.0;
     for (let i = 0; i < selected_courses.length; i++) {
-        count += parseFloat(stump_to_data[selected_courses[i]["stump"]]["data"]["courseCredits"]);
+        if (selected_courses[i]["type"] == 'course') {
+            count += parseFloat(stump_to_data[selected_courses[i]["stump"]]["data"]["courseCredits"]);
+        }
     }
     return count;
 }
@@ -574,16 +775,28 @@ function formatProfs(code) {
     }
 }
 
+/* Determine if a string is a section or a custom id */
+function isCustom(section) {
+    if (section.length > 6 && section.substring(0, 7) == 'custom-') {
+        return true;
+    }
+    return false;
+}
+
 /* Find all permutations from selected courses and filters (conflicts included) */
 function permute(courseList) {
     var r = [], max = courseList.length - 1;
     function helper(sections, i) {
         let actualSections;
-        // If no filters, assume all sections ok
-        if (courseList[i]["filteredSections"].length == 0) {
-            actualSections = courseList[i]["openSections"];
+        if (courseList[i]["type"] == 'custom') {
+            actualSections = ['custom-'+courseList[i]["name"]];
         } else {
-            actualSections = courseList[i]["filteredSections"];
+            // If no filters, assume all sections ok
+            if (courseList[i]["filteredSections"].length == 0) {
+                actualSections = courseList[i]["openSections"];
+            } else {
+                actualSections = courseList[i]["filteredSections"];
+            }
         }
         for (var j = 0, l = actualSections.length; j < l; j++) {
             var a = sections.slice(0); // clone arr
@@ -625,8 +838,17 @@ function proposedScheduleConflict(sections) {
 
 /* Determine if two sections conflict */
 function sectionsConflict(section1, section2) {
-    let schedules1 = section_to_data[section1]["courseSchedule"];
-    let schedules2 = section_to_data[section2]["courseSchedule"];
+    let schedules1, schedules2;
+    if (isCustom(section1)) {
+        schedules1 = dictionaryGet(selected_courses, 'name', section1.substring(7), 'custom')["courseSchedule"];
+    } else {
+        schedules1 = section_to_data[section1]["courseSchedule"];
+    }
+    if (isCustom(section2)) {
+        schedules2 = dictionaryGet(selected_courses, 'name', section2.substring(7), 'custom')["courseSchedule"];
+    } else {
+        schedules2 = section_to_data[section2]["courseSchedule"];
+    }
     for (let i = 0; i < schedules1.length; i++) {
         for (let j = 0; j < schedules2.length; j++) {
             if (schedulesConflict(schedules1[i], schedules2[j])) {
@@ -709,27 +931,47 @@ function getFullSchedule(sections) {
 
 /* Construct a box to match the section's start and end times */
 function getCalendarEvent(section) {
-    let color = getColor(section);
-    let schedules = section_to_data[section]["courseSchedule"];
-    let name = section_to_data[section]["courseName"];
+    let color, schedules, name, seats, profs, custom, title;
+    if (isCustom(section)) {
+        custom = dictionaryGet(selected_courses, 'name', section.substring(7), 'custom');
+        color = 'customCard';
+        schedules = custom["courseSchedule"];
+        console.log(schedules);
+        title = 'Custom commitment';
+        name = section.substring(7);
+        seats = '';
+        profs = 'Custom commitment';
+    } else {
+        color = getColor(section);
+        schedules = section_to_data[section]["courseSchedule"];
+        title = section;
+        name = section_to_data[section]["courseName"];
+        seats = getSectionSeatsFilled(section);
+        profs = formatProfs(section);
+    }
     let html = '';
-    let seats = getSectionSeatsFilled(section);
     for (let i = 0; i < schedules.length; i++) {
-        let days = schedules[i]["scheduleDays"];
+        let days, start, end, formattedSeats;
+        days = schedules[i]["scheduleDays"];
         // No days specified
         if (days == '') {
             continue;
         }
-        let start = schedules[i]["scheduleStartTime"];
+        start = schedules[i]["scheduleStartTime"];
         // No time specified
         if (militaryToMinutes(start) == 0) {
             continue;
         }
-        let end = schedules[i]["scheduleEndTime"];
+        end = schedules[i]["scheduleEndTime"];
+        if (!isCustom(section)) {
+            formattedSeats = '(' + seats[0] + '/' + seats[1] + ')';
+        } else {
+            formattedSeats = '';
+        }
         for (let i = 0; i < days.length; i++) {
             html += '<div class="box ' + color + '" data-id="' + section + '" style="grid-row: ' + timeToRow(start) + ' / ' + 
-                    timeToRow(end) + '; cursor: pointer; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + section + 
-                    '</b> (' + seats[0] + '/' + seats[1] + ')<p>' + name + '<span class="tooltiptext">' + formatProfs(section) + '</span></div>';
+                    timeToRow(end) + '; cursor: pointer; grid-column: ' + dayToCols(days.charAt(i)) + ';"><b>' + title + 
+                    '</b> ' + formattedSeats + '<p>' + name + '<span class="tooltiptext">' + profs + '</span></div>';
         }
     }
     return html;
@@ -753,7 +995,12 @@ function getLowestAvailability(sections) {
     let highest = [0, 0, 0];
     // Find lowest
     sections.forEach(function(section) {
-        let seats = getSectionSeatsFilled(section);
+        let seats;
+        if (isCustom(section)) {
+            seats = [0, 0];
+        } else {
+            seats = getSectionSeatsFilled(section);
+        }
         if (seats[1] != 0) {
             if (seats[0] / seats[1] > highest[2]) {
                 highest = [seats[0], seats[1], seats[0] / seats[1]];
@@ -790,12 +1037,22 @@ function sortByAvailability() {
 function generateCourseCards(sections) {
     let html = '';
     sections.forEach(function(section) {
-        html += '<div class="card ml-1 mr-1 p-2 ' + getColor(section) + '" style="display: inline-block;">' + section + '</div>';
+        if (isCustom(section)) {
+            html += '<div class="card ml-1 mr-1 p-2 customCard" style="display: inline-block;">' + section.substring(7) + '</div>';
+        } else {
+            html += '<div class="card ml-1 mr-1 p-2 ' + getColor(section) + '" style="display: inline-block;">' + section + '</div>';
+        }
     });
     return html;
 }
 
-/* Get time and place of a given section */
+/* Get formatted time of a custom commitment */
+function getCustomTime(custom) {
+    let sched = custom["courseSchedule"][0];
+    return 'Meets ' + sched["scheduleDays"] + ', ' + militaryToRegular(sched["scheduleStartTime"]) + ' - ' + militaryToRegular(sched["scheduleEndTime"]);
+}
+
+/* Get formatted time and place of a given section */
 function getTimePlace(section) {
     let schedules = section_to_data[section]["courseSchedule"];
     let html = '';
@@ -820,6 +1077,9 @@ function militaryToRegular(military) {
     let hours, minutes, am_pm;
     if (parseInt(split[0]) > 12) {
         hours = parseInt(split[0]) - 12;
+        am_pm = 'PM';
+    } else if (parseInt(split[0]) == 12) {
+        hours = parseInt(split[0]);
         am_pm = 'PM';
     } else {
         hours = parseInt(split[0]);
