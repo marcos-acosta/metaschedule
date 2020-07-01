@@ -2,6 +2,3 @@ TODO
 
 OPERATION HYDRA
 - Netlify
-
-OPERATION TITAN
-- Display time since last refresh

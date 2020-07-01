@@ -116,6 +116,12 @@ $(document).ready(function(){
             $("#courseInfo").html('');
             if (selected_courses.length != 0) {
                 $("#generateButton").trigger("click");
+            } else {
+                $("#scheduleCard").slideUp("fast", "swing", function() {
+                    $("#wholeScheduleContainer").hide();
+                    $("#info").show();
+                    $("#scheduleCard").slideDown("fast", "swing");
+                });
             }
             deactivateGenerateButton();
             last_refresh_time = Date.now();
@@ -142,7 +148,7 @@ $(document).ready(function(){
     /* Generate schedules */
     $("#generateButton").click(function() {
         $("#scheduleCard").slideUp("fast", "swing", function() {
-            $("#info").remove();
+            $("#info").hide();
             // Generate schedules
             non_conflicts = getAllSchedules();
             current = 0;
