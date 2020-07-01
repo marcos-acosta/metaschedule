@@ -5,7 +5,7 @@ An online web app for students who want to consider multiple possible schedules 
 
 ### Where is it?
 
-Website address to be registered!
+[Right here!](https://metaschedule.netlify.app/)
 
 ### How do I use it?
 1. Search for and add any courses you're planning on taking in the 'course search' panel
