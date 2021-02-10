@@ -432,7 +432,6 @@ function addCourse(stump) {
     selected_courses.push(getCourseDict(stump));
     updateCourseList();
     updateFilters();
-    console.log('Selected courses:', selected_courses);
 }
 
 /* Adds a custom commitment and updates everything */
@@ -440,7 +439,6 @@ function addCustom(custom) {
     selected_courses.push(custom);
     updateCourseList();
     updateFilters();
-    console.log('Selected courses:', selected_courses);
 }
 
 /* Make generate button visually clickable */
@@ -743,13 +741,12 @@ function getColorOrGray(name, seats) {
 
 /* Cut a code down to a stump */
 function stumpify(code) {
-    return code.split('-')[0];
+    return code.substring(0, 8).trim();
 }
 
 /* Cut a query to a stump */
 function queryToStump(name) {
-    words = name.split(' ');
-    return words[0] + ' ' + words[1] + ' ' + words[2];
+    return name.substring(0, 8).trim();
 }
 
 /* Generate mapping of stumps to sections */
@@ -1000,7 +997,6 @@ function getCalendarEvent(section) {
         custom = dictionaryGet(selected_courses, 'name', section.substring(7), 'custom');
         color = 'customCard';
         schedules = custom["courseSchedule"];
-        console.log(schedules);
         title = 'Custom commitment';
         name = section.substring(7);
         seats = '';
