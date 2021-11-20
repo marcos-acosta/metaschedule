@@ -6,15 +6,19 @@ import "./App.css"
 export default function App() {
   const [courseData, setCourseData] = useState(null);
 
-  useEffect(() => {
+  const refresh = () => {
     axios.get("https://hyperschedule.herokuapp.com/api/v3/courses")
       .then(response => setCourseData(response.data))
       .catch(err => console.log(`[ERR]: ${err}`));
+  }
+
+  useEffect(() => {
+    refresh();
   }, []);
 
   return (
     <>
-      <Header />
+      <Header refreshCallback={refresh} />
     </>
   )
 }
