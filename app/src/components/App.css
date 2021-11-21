@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  padding-top: 60px;
   font-family: "Source Code Pro", sans-serif;
 }
 
@@ -14,4 +15,10 @@ button {
   padding-left: 15px;
   padding-right: 15px;
   border-radius: 5px;
+}
+
+.viewSwitcher {
+  margin-top: 20px;
+  width: 100%;
+  text-align: center;
 }

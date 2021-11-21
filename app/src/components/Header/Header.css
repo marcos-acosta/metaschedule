@@ -1,16 +1,18 @@
 .header {
   width: 100%;
   display: grid;
-  grid-template-columns: 120px 1fr 120px 120px;
+  grid-template-columns: 60px 1fr 1fr 120px 120px;
   grid-template-rows: 60px;
   background-color: #343a40;
   color: white;
   font-weight: bold;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  position: fixed;
+  top: 0;
 }
 
 .headerTitle {
-  grid-column: 1 / span 4;
+  grid-column: 1 / span 5;
   grid-row: 1;
   text-align: center;
   margin-top: 15px;
@@ -23,7 +25,7 @@
 }
 
 .headerButton1 {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 1;
 }
 
@@ -38,7 +40,12 @@
 }
 
 .headerButton2 {
-  grid-column: 4;
+  grid-column: 5;
+  grid-row: 1;
+}
+
+.switcherContainer {
+  grid-column: 2;
   grid-row: 1;
 }
 
