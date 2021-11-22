@@ -1,7 +1,7 @@
 .header {
   width: 100%;
   display: grid;
-  grid-template-columns: 60px 1fr 1fr 120px 120px;
+  grid-template-columns: 60px 1fr 120px 120px;
   grid-template-rows: 60px;
   background-color: #343a40;
   color: white;
@@ -12,7 +12,7 @@
 }
 
 .headerTitle {
-  grid-column: 1 / span 5;
+  grid-column: 1 / span 4;
   grid-row: 1;
   text-align: center;
   margin-top: 15px;
@@ -25,27 +25,12 @@
 }
 
 .headerButton1 {
-  grid-column: 4;
+  grid-column: 3;
   grid-row: 1;
-}
-
-.gitHubButton {
-  background-color: #6c757d;
-  color: white;
-}
-
-.refreshButton {
-  background-color: #007bff;
-  color: white;
 }
 
 .headerButton2 {
-  grid-column: 5;
-  grid-row: 1;
-}
-
-.switcherContainer {
-  grid-column: 2;
+  grid-column: 4;
   grid-row: 1;
 }
 

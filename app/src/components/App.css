@@ -22,3 +22,35 @@ button {
   width: 100%;
   text-align: center;
 }
+
+.blueButton {
+  background-color: #007bff;
+  color: white;
+  transition-property: background-color;
+  transition-duration: 0.4s;
+}
+
+.blueButton:hover {
+  background-color: #0173ec;
+}
+
+.darkGrayButton {
+  background-color: #6c757d;
+  color: white;
+  transition-property: background-color;
+  transition-duration: 0.4s;
+}
+
+.darkGrayButton:hover {
+  background-color: #636c74;
+}
+
+.lightGrayButton {
+  background-color: #e2e8ee;
+  transition-property: background-color;
+  transition-duration: 0.4s;
+}
+
+.lightGrayButton:hover {
+  background-color: #d9dfe4;
+}

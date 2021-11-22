@@ -11,12 +11,5 @@
 .switcherButton {
   padding: 5px;
   width: 150px;
-  background-color: rgb(231, 231, 231);
-  /* border: 1px solid rgb(255, 255, 255); */
-}
-
-.selected {
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
+  border: 1px solid rgb(255, 255, 255);
 }

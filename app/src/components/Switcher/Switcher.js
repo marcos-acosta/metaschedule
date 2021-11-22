@@ -9,7 +9,7 @@ export default function Switcher(props) {
         options.map((option, i) =>
           <button key={i} 
                   onClick={() => onChange(i)} 
-                  className={`switcherButton ${value === i ? "selected" : ""} ${!i ? "firstOption" : ""} ${i === options.length - 1 ? "lastOption" : ""}`}>
+                  className={`switcherButton ${value === i ? "blueButton" : "lightGrayButton"} ${!i ? "firstOption" : ""} ${i === options.length - 1 ? "lastOption" : ""}`}>
             {option}
           </button>  
         )

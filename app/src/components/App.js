@@ -4,6 +4,7 @@ import Header from "./Header/Header";
 import "./App.css"
 import util from "../util";
 import CourseView from "./CourseView/CourseView";
+import Switcher from "./Switcher/Switcher";
 
 export default function App() {
   const [fullData, setfullData] = useState(null);
@@ -43,7 +44,11 @@ export default function App() {
 
   return (
     <>
-      <Header refreshCallback={refresh} viewState={viewState} setViewState={setViewState}/>
+      <Header refreshCallback={refresh}/>
+      <Switcher options={["Courses", "Schedules"]}
+                value={viewState}
+                onChange={(i) => setViewState(i)}
+                className="viewSwitcher" />
       {
         viewState === 0
           ? <CourseView isLoading={isLoading} courses={groupedData} />
