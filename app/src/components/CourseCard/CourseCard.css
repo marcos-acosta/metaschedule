@@ -18,11 +18,17 @@
   grid-column: 3;
   background-color: rgba(0, 0, 0, 0.082);
   font-size: 20px;
+  padding-top: 2px;
   text-align: center;
+  box-sizing: border-box;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   transition-property: background-color;
   transition-duration: 1s;
+}
+
+.courseCard.expanded > .addButton {
+  border-bottom-right-radius: 0px;
 }
 
 .addButton:hover {
@@ -55,8 +61,17 @@
   grid-row: 2;
   grid-column: 1 / 4;
   padding: 10px;
-  background-color: rgba(255, 255, 255, 0.63);
+  background-color: rgba(255, 255, 255, 0.781);
   color: black;
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
+  transition-property: height, padding;
+  transition-duration: 0.5s;
+  height: 150px;
+  overflow: auto;
+}
+
+.courseDetails.hidden {
+  height: 0;
+  padding: 0px;
 }

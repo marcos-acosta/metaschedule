@@ -11,13 +11,10 @@ export default function CourseCard(props) {
           onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>
       <div className="courseGroup">{props.courseGroup}</div>
       <div className="courseTitle">{props.courseData.courseName}</div>
-      <div className="addButton">+</div>
-      {
-        props.expanded
-          && <div className="courseDetails">
-            {props.courseData.courseDescription || "No course description provided."}
-          </div>
-      }
+      <div className="addButton">＋</div>
+      <div className={`courseDetails ${props.expanded ? "" : "hidden"}`}>
+        {props.courseData.courseDescription || "No course description provided."}
+      </div>
     </div>
   )
 }

@@ -82,3 +82,18 @@ input {
 .course-group-aqua {
   background-color: #bdece8;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #2b2b2b57;
+}
