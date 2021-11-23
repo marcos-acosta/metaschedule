@@ -10,6 +10,10 @@ button {
   cursor: pointer;
 }
 
+input {
+  font-family: "Source Code Pro", sans-serif;
+}
+
 .metaButton {
   padding: 5px;
   padding-left: 15px;
@@ -53,4 +57,28 @@ button {
 
 .lightGrayButton:hover {
   background-color: #d9dfe4;
+}
+
+.course-group-blue {
+  background-color: #c2e4f0;
+}
+
+.course-group-purple {
+  background-color: #dbc9db;
+}
+
+.course-group-green {
+  background-color: #cae4ca;
+}
+
+.course-group-red {
+  background-color: #ffb6ae;
+}
+
+.course-group-yellow {
+  background-color: #ffffb5;
+}
+
+.course-group-aqua {
+  background-color: #bdece8;
 }

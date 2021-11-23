@@ -11,6 +11,8 @@ export default function App() {
   const [groupedData, setGroupedData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [viewState, setViewState] = useState(0);
+  const [searchString, setSearchString] = useState("");
+  const keywords = Object.fromEntries(Object.entries(groupedData).map(([group, courses]) => [`${group} ${Object.values(courses)[0].courseName}`, group]));
 
   const refresh = () => {
     setIsLoading(true);
@@ -42,6 +44,13 @@ export default function App() {
     setGroupedData(groupedData_);
   }, [fullData]);
 
+  const filterGroupedData = () => (
+    Object.fromEntries(Object.entries(keywords).filter(
+      ([keyword, _]) => 
+        keyword.toLowerCase().match(new RegExp(searchString.toLowerCase()))
+    ).map(([_, courseGroup]) => [courseGroup, groupedData[courseGroup]]))
+  )
+
   return (
     <>
       <Header refreshCallback={refresh}/>
@@ -51,7 +60,10 @@ export default function App() {
                 className="viewSwitcher" />
       {
         viewState === 0
-          ? <CourseView isLoading={isLoading} courses={groupedData} />
+          ? <CourseView isLoading={isLoading} 
+                        courses={filterGroupedData()}
+                        searchString={searchString}
+                        setSearchString={setSearchString} />
           : <>Schedule view</>
       }
     </>

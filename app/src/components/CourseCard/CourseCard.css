@@ -1,0 +1,23 @@
+.courseCard {
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  grid-template-rows: 1fr;
+}
+
+.courseGroup {
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.082);
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  padding: 5px;
+  padding-left: 10px;
+}
+
+.courseTitle {
+  padding: 5px;
+  padding-left: 10px;
+}
