@@ -1,11 +1,32 @@
 .courseCard {
   margin: 5px;
+  margin-bottom: 7px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
   display: grid;
-  grid-template-columns: 120px 1fr;
-  grid-template-rows: 1fr;
+  grid-template-columns: 130px 1fr 40px;
+  grid-template-rows: 30px;
+}
+
+.courseCard.expanded {
+  grid-template-rows: 30px 1fr;
+}
+
+.addButton {
+  grid-row: 1;
+  grid-column: 3;
+  background-color: rgba(0, 0, 0, 0.082);
+  font-size: 20px;
+  text-align: center;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  transition-property: background-color;
+  transition-duration: 1s;
+}
+
+.addButton:hover {
+  background-color: rgba(0, 0, 0, 0.151);
 }
 
 .courseGroup {
@@ -15,9 +36,27 @@
   border-bottom-left-radius: 5px;
   padding: 5px;
   padding-left: 10px;
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.courseCard.expanded > .courseGroup {
+  border-bottom-left-radius: 0px;
 }
 
 .courseTitle {
   padding: 5px;
   padding-left: 10px;
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.courseDetails {
+  grid-row: 2;
+  grid-column: 1 / 4;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.63);
+  color: black;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
 }

@@ -1,17 +1,17 @@
 body {
   margin: 0;
   padding-top: 60px;
-  font-family: "Source Code Pro", sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 button {
-  font-family: "Source Code Pro", sans-serif;
+  font-family: "Open Sans", sans-serif;
   border: none;
   cursor: pointer;
 }
 
 input {
-  font-family: "Source Code Pro", sans-serif;
+  font-family: "Open Sans", sans-serif;
 }
 
 .metaButton {

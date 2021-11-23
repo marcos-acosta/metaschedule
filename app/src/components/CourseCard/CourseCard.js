@@ -7,9 +7,17 @@ const getCardColor = (courseGroup) => (
 
 export default function CourseCard(props) {
   return (
-    <div className={`courseCard ${getCardColor(props.courseGroup)}`}>
+    <div  className={`courseCard ${getCardColor(props.courseGroup)} ${props.expanded ? 'expanded' : ''}`}
+          onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>
       <div className="courseGroup">{props.courseGroup}</div>
       <div className="courseTitle">{props.courseData.courseName}</div>
+      <div className="addButton">+</div>
+      {
+        props.expanded
+          && <div className="courseDetails">
+            {props.courseData.courseDescription || "No course description provided."}
+          </div>
+      }
     </div>
   )
 }

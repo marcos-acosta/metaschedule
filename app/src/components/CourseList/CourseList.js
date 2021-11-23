@@ -9,7 +9,9 @@ export default function CourseList(props) {
           ? Object.keys(props.courses).map((group, i) => 
               <CourseCard key={i}
                           courseGroup={group}
-                          courseData={Object.values(props.courses[group])[0]} />)
+                          courseData={Object.values(props.courses[group])[0]}
+                          expanded={props.expandedCourseGroup === group}
+                          setExpandedCourseGroup={props.setExpandedCourseGroup} />)
           : <div>Loading...</div>
       }
     </div>

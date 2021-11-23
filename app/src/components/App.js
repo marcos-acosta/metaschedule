@@ -12,7 +12,13 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [viewState, setViewState] = useState(0);
   const [searchString, setSearchString] = useState("");
-  const keywords = Object.fromEntries(Object.entries(groupedData).map(([group, courses]) => [`${group} ${Object.values(courses)[0].courseName}`, group]));
+  const [expandedCourseGroup, setExpandedCourseGroup] = useState(null);
+  const keywords = Object.fromEntries(
+    Object.entries(groupedData).map(
+      ([group, courses]) => 
+        [`${group} ${Object.values(courses)[0].courseName}`, group]
+    )
+  );
 
   const refresh = () => {
     setIsLoading(true);
@@ -63,7 +69,9 @@ export default function App() {
           ? <CourseView isLoading={isLoading} 
                         courses={filterGroupedData()}
                         searchString={searchString}
-                        setSearchString={setSearchString} />
+                        setSearchString={setSearchString}
+                        expandedCourseGroup={expandedCourseGroup}
+                        setExpandedCourseGroup={setExpandedCourseGroup} />
           : <>Schedule view</>
       }
     </>
