@@ -11,7 +11,7 @@ export default function Header(props) {
         Metaschedule
       </div>
       <div className="headerButton1">
-        <button className="headerButton metaButton blueButton" onClick={props.refreshCallback}>
+        <button className="headerButton metaButton blueButton" onClick={() => props.refreshCallback()}>
           Refresh
         </button>
       </div>
