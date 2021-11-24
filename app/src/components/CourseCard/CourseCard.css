@@ -2,7 +2,6 @@
   margin: 5px;
   margin-bottom: 7px;
   border-radius: 5px;
-  cursor: pointer;
   font-size: 14px;
   display: grid;
   grid-template-columns: 130px 1fr 40px;
@@ -25,6 +24,7 @@
   border-bottom-right-radius: 5px;
   transition-property: background-color;
   transition-duration: 1s;
+  cursor: pointer;
 }
 
 .courseCard.expanded > .addButton {
@@ -55,6 +55,7 @@
   padding-left: 10px;
   grid-row: 1;
   grid-column: 2;
+  cursor: pointer;
 }
 
 .courseDetails {
@@ -68,7 +69,6 @@
   transition-duration: 0.5s;
   height: 300px;
   overflow-y: scroll;
-  cursor: initial;
 }
 
 .courseDetails.hidden {

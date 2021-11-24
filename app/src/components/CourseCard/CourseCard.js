@@ -11,10 +11,9 @@ export default function CourseCard(props) {
   const credits = parseFloat(props.courseData.groupCredits) * (groupInfo.college === util.HARVEY_MUDD ? 1 : 3);
 
   return (
-    <div  className={`courseCard ${getCardColor(props.courseGroup)} ${props.expanded ? 'expanded' : ''}`}
-          onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>
+    <div  className={`courseCard ${getCardColor(props.courseGroup)} ${props.expanded ? 'expanded' : ''}`}>
       <div className="courseGroup">{props.courseGroup}</div>
-      <div className="courseTitle">{props.courseData.groupName}</div>
+      <div className="courseTitle" onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>{props.courseData.groupName}</div>
       <div className="addButton">＋</div>
       <div className={`courseDetails ${props.expanded ? "" : "hidden"}`}>
         {props.expanded && 
