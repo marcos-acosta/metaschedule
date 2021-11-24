@@ -28,6 +28,12 @@ const util = {
   CLAREMONT_MCKENNA: "CMC",
   SCRIPPS: "SC",
   POMONA: "PO",
-  PITZER: "PZ"
+  PITZER: "PZ",
+  militaryToAMPM(military) {
+    let [hh, mm] = military.split(":").map(x => parseInt(x));
+    let pm = hh >= 12;
+    hh = hh > 12 ? hh - 12 : hh;
+    return `${hh}:${`${mm}`.padStart(2, '0')} ${pm ? 'PM' : 'AM'}`;
+  }
 }
 export default util;

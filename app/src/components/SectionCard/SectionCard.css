@@ -20,3 +20,8 @@
 .sectionTitleContainer {
   display: inline-block;
 }
+
+.percentFilled {
+  font-size: 18px;
+  margin-bottom: 3px;
+}

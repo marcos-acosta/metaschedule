@@ -33,7 +33,8 @@ export default function CourseCard(props) {
                                       seatsTotal={sectionData.courseSeatsTotal}
                                       professors={sectionData.courseInstructors}
                                       status={sectionData.courseEnrollmentStatus}
-                                      key={sectionCode} />
+                                      key={sectionCode}
+                                      schedule={sectionData.courseSchedule} />
                 })
               }
             </div>
