@@ -5,10 +5,11 @@ export default function SearchContext(props) {
   const [searchString, setSearchString] = useState("");
 
   const filterGroupedData = () => {
-    return Object.fromEntries(Object.entries(props.keywords).filter(
-      ([keyword, _]) => 
-        keyword.toLowerCase().match(new RegExp(searchString.toLowerCase()))
-    ).map(([_, courseGroup]) => [courseGroup, props.groupedData[courseGroup]]))
+    return Object.fromEntries(
+      Object.entries(props.groupedData).filter(
+        ([_, group]) => 
+          group.searchKey.toLowerCase().match(new RegExp(searchString.toLowerCase()))
+      ));
   };
 
   return <App setSearchString={setSearchString}

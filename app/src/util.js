@@ -10,7 +10,11 @@ const util = {
   },
   splitCourseGroup(crouseGroup) {
     const split = crouseGroup.split(' ');
-    return [split[0], split.slice(1, -1).join(' '), split[-1]];
+    return {
+      department: split[0], 
+      number: split.slice(1, -1).join(' '),
+      college: split.at(-1)
+    };
   },
   colors: [
     "course-group-blue",
@@ -19,6 +23,11 @@ const util = {
     "course-group-red",
     "course-group-yellow",
     "course-group-aqua",
-  ]
+  ],
+  HARVEY_MUDD: "HM",
+  CLAREMONT_MCKENNA: "CMC",
+  SCRIPPS: "SC",
+  POMONA: "PO",
+  PITZER: "PZ"
 }
 export default util;

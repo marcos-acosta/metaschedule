@@ -83,17 +83,22 @@ input {
   background-color: #bdece8;
 }
 
-/* width */
+.bold {
+  font-weight: bold;
+}
+
 ::-webkit-scrollbar {
   width: 5px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 
-/* Handle */
 ::-webkit-scrollbar-thumb {
   background: #2b2b2b57;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2b2b2b6e;
 }

@@ -1,5 +1,4 @@
 import CourseCard from "./../CourseCard/CourseCard";
-import "./CourseList.css";
 
 export default function CourseList(props) {
   return (
@@ -10,7 +9,7 @@ export default function CourseList(props) {
           : Object.keys(props.courses).map((group, i) => 
               <CourseCard key={i}
                           courseGroup={group}
-                          courseData={Object.values(props.courses[group])[0]}
+                          courseData={props.courses[group]}
                           expanded={props.expandedCourseGroup === group}
                           setExpandedCourseGroup={props.setExpandedCourseGroup} />)
       }

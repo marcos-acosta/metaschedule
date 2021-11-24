@@ -61,10 +61,9 @@
   grid-row: 2;
   grid-column: 1 / 4;
   padding: 10px;
-  background-color: rgba(255, 255, 255, 0.781);
+  background-color: rgba(255, 255, 255);
+  border-bottom: 1px rgb(228, 228, 228) solid;
   color: black;
-  border-bottom-right-radius: 5px;
-  border-bottom-left-radius: 5px;
   transition-property: height, padding;
   transition-duration: 0.5s;
   height: 150px;
@@ -74,4 +73,10 @@
 .courseDetails.hidden {
   height: 0;
   padding: 0px;
+  border: none;
+}
+
+.creditText {
+  font-weight: 400;
+  color: gray;
 }

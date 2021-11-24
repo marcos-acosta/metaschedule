@@ -6,14 +6,20 @@ const getCardColor = (courseGroup) => (
 );
 
 export default function CourseCard(props) {
+  const groupInfo = util.splitCourseGroup(props.courseGroup);
+  const credits = parseFloat(props.courseData.groupCredits) * (groupInfo.college === util.HARVEY_MUDD ? 1 : 3);
+
   return (
     <div  className={`courseCard ${getCardColor(props.courseGroup)} ${props.expanded ? 'expanded' : ''}`}
           onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>
       <div className="courseGroup">{props.courseGroup}</div>
-      <div className="courseTitle">{props.courseData.courseName}</div>
+      <div className="courseTitle">{props.courseData.groupName}</div>
       <div className="addButton">＋</div>
       <div className={`courseDetails ${props.expanded ? "" : "hidden"}`}>
-        {props.courseData.courseDescription || "No course description provided."}
+        <h3>{props.courseData.groupName} <span className="creditText">({credits} credit{credits === 1 ? "" : "s"})</span></h3>
+        <div>
+          {props.courseData.groupDescription || "No course description provided."}
+        </div>
       </div>
     </div>
   )

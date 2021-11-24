@@ -7,12 +7,6 @@ export default function DataProvider() {
   const [fullData, setfullData] = useState(null);
   const [groupedData, setGroupedData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const keywords = Object.fromEntries(
-    Object.entries(groupedData).map(
-      ([group, courses]) => 
-        [`${group} ${Object.values(courses)[0].courseName}`, group]
-    )
-  );
 
   const refresh = () => {
     setIsLoading(true);
@@ -33,10 +27,14 @@ export default function DataProvider() {
         const course = fullData.data.courses[courseCode];
         const [courseGroup, courseSection] = util.splitCourseCode(courseCode);
         if (groupedData_.hasOwnProperty(courseGroup)) {
-          groupedData_[courseGroup][courseSection] = course;
+          groupedData_[courseGroup].sections.push(courseSection);
         } else {
           groupedData_[courseGroup] = {
-            [courseSection]: course
+            sections: [courseSection],
+            groupName: course.courseName,
+            groupDescription: course.courseDescription,
+            searchKey: `${courseGroup} ${course.courseName}`,
+            groupCredits: course.courseCredits,
           };
         }
       });
@@ -46,6 +44,5 @@ export default function DataProvider() {
 
   return <SearchContext groupedData={groupedData}
               isLoading={isLoading}
-              keywords={keywords}
               refresh={refresh}/>
 }
