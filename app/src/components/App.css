@@ -86,19 +86,3 @@ input {
 .bold {
   font-weight: bold;
 }
-
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #2b2b2b57;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #2b2b2b6e;
-}

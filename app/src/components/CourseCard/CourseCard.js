@@ -1,3 +1,4 @@
+import SectionCard from "../SectionCard/SectionCard";
 import util from "./../../util";
 import "./CourseCard.css";
 
@@ -16,10 +17,26 @@ export default function CourseCard(props) {
       <div className="courseTitle">{props.courseData.groupName}</div>
       <div className="addButton">＋</div>
       <div className={`courseDetails ${props.expanded ? "" : "hidden"}`}>
-        <h3>{props.courseData.groupName} <span className="creditText">({credits} credit{credits === 1 ? "" : "s"})</span></h3>
-        <div>
-          {props.courseData.groupDescription || "No course description provided."}
-        </div>
+        {props.expanded && 
+          <>
+            <h3>{props.courseData.groupName} <span className="creditText">({credits} credit{credits === 1 ? "" : "s"})</span></h3>
+            <div className="descriptionContainer">
+              {props.courseData.groupDescription || "No course description provided."}
+            </div>
+            <div className="sectionContainer">
+              {
+                props.courseData.sections.map(sectionCode => {
+                  let sectionData = props.getFullCourseData(sectionCode);
+                  return <SectionCard section={sectionCode}
+                                      seatsFilled={sectionData.courseSeatsFilled}
+                                      seatsTotal={sectionData.courseSeatsTotal}
+                                      professors={sectionData.courseInstructors}
+                                      key={sectionCode} />
+                })
+              }
+            </div>
+          </>
+        }
       </div>
     </div>
   )

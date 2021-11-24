@@ -25,12 +25,12 @@ export default function DataProvider() {
     if (fullData) {
       Object.keys(fullData.data.courses).forEach(courseCode => {
         const course = fullData.data.courses[courseCode];
-        const [courseGroup, courseSection] = util.splitCourseCode(courseCode);
+        const courseGroup = util.getCourseGroup(courseCode);
         if (groupedData_.hasOwnProperty(courseGroup)) {
-          groupedData_[courseGroup].sections.push(courseSection);
+          groupedData_[courseGroup].sections.push(courseCode);
         } else {
           groupedData_[courseGroup] = {
-            sections: [courseSection],
+            sections: [courseCode],
             groupName: course.courseName,
             groupDescription: course.courseDescription,
             searchKey: `${courseGroup} ${course.courseName}`,
@@ -42,7 +42,10 @@ export default function DataProvider() {
     setGroupedData(groupedData_);
   }, [fullData]);
 
+  const getFullCourseData = (courseCode) => fullData.data.courses[courseCode];
+
   return <SearchContext groupedData={groupedData}
-              isLoading={isLoading}
-              refresh={refresh}/>
+                        isLoading={isLoading}
+                        refresh={refresh}
+                        getFullCourseData={getFullCourseData}/>
 }

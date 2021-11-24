@@ -66,8 +66,9 @@
   color: black;
   transition-property: height, padding;
   transition-duration: 0.5s;
-  height: 150px;
-  overflow: auto;
+  height: 300px;
+  overflow-y: scroll;
+  cursor: initial;
 }
 
 .courseDetails.hidden {
@@ -79,4 +80,28 @@
 .creditText {
   font-weight: 400;
   color: gray;
+}
+
+.descriptionContainer {
+  margin-bottom: 5px;
+}
+
+.sectionContainer {
+  margin-bottom: 5px;
+}
+
+.courseDetails::-webkit-scrollbar {
+  width: 10px;
+}
+
+.courseDetails::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.courseDetails::-webkit-scrollbar-thumb {
+  background: #2b2b2b57;
+}
+
+.courseDetails::-webkit-scrollbar-thumb:hover {
+  background: #2b2b2b6e;
 }

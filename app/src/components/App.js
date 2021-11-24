@@ -21,6 +21,7 @@ export default function App(props) {
                         courses={props.filteredData}
                         searchString={props.searchString}
                         setSearchString={props.setSearchString}
+                        getFullCourseData={props.getFullCourseData}
                         expandedCourseGroup={expandedCourseGroup}
                         setExpandedCourseGroup={setExpandedCourseGroup} />
           : <>Schedule view</>

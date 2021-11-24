@@ -11,7 +11,8 @@ export default function CourseList(props) {
                           courseGroup={group}
                           courseData={props.courses[group]}
                           expanded={props.expandedCourseGroup === group}
-                          setExpandedCourseGroup={props.setExpandedCourseGroup} />)
+                          setExpandedCourseGroup={props.setExpandedCourseGroup}
+                          getFullCourseData={props.getFullCourseData} />)
       }
     </div>
   )

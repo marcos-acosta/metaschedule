@@ -12,7 +12,8 @@ export default function SearchContext(props) {
       ));
   };
 
-  return <App setSearchString={setSearchString}
+  return <App searchString={searchString}
+              setSearchString={setSearchString}
               filteredData={filterGroupedData()}
               {...props} />
 }
