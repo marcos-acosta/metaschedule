@@ -27,10 +27,12 @@ export default function CourseCard(props) {
               {
                 props.courseData.sections.map(sectionCode => {
                   let sectionData = props.getFullCourseData(sectionCode);
+                  // console.log(sectionData);
                   return <SectionCard section={sectionCode}
                                       seatsFilled={sectionData.courseSeatsFilled}
                                       seatsTotal={sectionData.courseSeatsTotal}
                                       professors={sectionData.courseInstructors}
+                                      status={sectionData.courseEnrollmentStatus}
                                       key={sectionCode} />
                 })
               }

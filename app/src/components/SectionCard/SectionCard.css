@@ -7,3 +7,16 @@
   display: inline-block;
   margin: 5px;
 }
+
+.profContainer {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.statusFlagContainer {
+  margin-left: 10px
+}
+
+.sectionTitleContainer {
+  display: inline-block;
+}

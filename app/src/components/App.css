@@ -86,3 +86,7 @@ input {
 .bold {
   font-weight: bold;
 }
+
+.floatRight {
+  float: right;
+}

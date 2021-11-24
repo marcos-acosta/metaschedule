@@ -1,3 +1,4 @@
+import StatusFlag from "../StatusFlag/StatusFlag";
 import "./SectionCard.css";
 
 const formatProfs = (profs) => {
@@ -11,12 +12,17 @@ const formatProfs = (profs) => {
 }
 
 export default function SectionCard(props) {
-  return <div className="sectionCard">
-    <div className="bold">
-      {props.section} ({props.seatsFilled} / {props.seatsTotal})
+  return (
+    <div className="sectionCard">
+      <div className="sectionTitleContainer bold">
+        {props.section} ({props.seatsFilled} / {props.seatsTotal})
+      </div>
+      <div className="statusFlagContainer floatRight">
+        <StatusFlag status={props.status} />
+      </div>
+      <div className="profContainer">
+        Instructor{props.professors.length === 1 ? "" : "s"}: {formatProfs(props.professors)}
+      </div>
     </div>
-    <div>
-      Instructor{props.professors.length === 1 ? "" : "s"}: {formatProfs(props.professors)}
-    </div>
-  </div>
+  )
 }
