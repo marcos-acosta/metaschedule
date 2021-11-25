@@ -20,5 +20,6 @@ export default function SearchContext(props) {
   return <App searchString={searchString}
               setSearchString={setSearchString}
               filteredData={filterGroupedData()}
+              allGroups={props.groupedData}
               {...props} />
 }

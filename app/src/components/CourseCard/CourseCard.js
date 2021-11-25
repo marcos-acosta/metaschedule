@@ -14,8 +14,10 @@ export default function CourseCard(props) {
     <div  className={`courseCard ${getCardColor(props.courseGroup)} ${props.expanded ? 'expanded' : ''}`}>
       <div className="courseGroup">{props.courseGroup}</div>
       <div className="courseTitle" onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>{props.courseData.groupName}</div>
-      <div className="addButton">＋</div>
-      <div className={`courseDetails ${props.expanded ? "" : "hidden"}`}>
+      <div className="addButton"  onClick={() => props.isAdded ? props.removeGroup(props.courseGroup) : props.addGroup(props.courseGroup)}>
+        <div className={`plus ${props.isAdded ? 'rotated45' : ''}`}>＋</div>
+      </div>
+      <div className={`courseDetails ${props.expanded ? "" : "hiddenDetails"}`}>
         {props.expanded && 
           <>
             <h3>{props.courseData.groupName} <span className="creditText">({credits} credit{credits === 1 ? "" : "s"})</span></h3>

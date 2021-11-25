@@ -90,3 +90,7 @@ input {
 .floatRight {
   float: right;
 }
+
+.hidden {
+  display: none !important;
+}

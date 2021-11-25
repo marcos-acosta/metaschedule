@@ -5,7 +5,7 @@ import "./CourseView.css";
 
 export default function CourseView(props) {
   return (
-    <div className="courseViewContainer">
+    <div className={`courseViewContainer ${props.hidden ? 'hidden' : ''}`}>
       <div className="courseListContainer">
         <div className="searchBarContainer">
           <SearchBar  value={props.searchString} 
