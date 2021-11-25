@@ -9,3 +9,8 @@
 .sidebarTitle {
   margin-block-start: 0;
 }
+
+.creditTotal {
+  text-align: center;
+  color: gray;
+}

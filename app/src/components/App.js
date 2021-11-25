@@ -7,15 +7,18 @@ import ScheduleView from "./ScheduleView/ScheduleView";
 
 export default function App(props) {
   const [viewState, setViewState] = useState(0);
-  const [expandedCourseGroup, setExpandedCourseGroup] = useState(null);
+  const [expandedCourseGroup, setExpandedCourseGroup] = useState([null, null]);
   const [selectedGroups, setSelectedGroups] = useState([]);
 
-  const addGroup = (group) => {
-    setSelectedGroups([...selectedGroups, group]);
+  const addGroup = (group, credits) => {
+    setSelectedGroups([...selectedGroups, {
+      groupName: group,
+      credits: credits
+    }]);
   }
 
   const removeGroup = (group) => {
-    setSelectedGroups(selectedGroups.filter(group_ => group_ !== group));
+    setSelectedGroups(selectedGroups.filter(group_ => group_.groupName !== group));
   }
 
   return (

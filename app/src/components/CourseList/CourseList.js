@@ -1,3 +1,4 @@
+import util from "../../util";
 import CourseCard from "./../CourseCard/CourseCard";
 
 export default function CourseList(props) {
@@ -10,12 +11,12 @@ export default function CourseList(props) {
               <CourseCard key={group}
                           courseGroup={group}
                           courseData={props.courses[group]}
-                          expanded={props.expandedCourseGroup === group}
-                          setExpandedCourseGroup={props.setExpandedCourseGroup}
+                          expanded={props.expandedCourseGroup[0] === group && props.expandedCourseGroup[1] === util.COURSELIST}
+                          setExpandedCourseGroup={(group) => props.setExpandedCourseGroup([group, util.COURSELIST])}
                           getFullCourseData={props.getFullCourseData}
                           addGroup={props.addGroup}
                           removeGroup={props.removeGroup}
-                          isAdded={props.selectedGroups.includes(group)} />)
+                          isAdded={props.selectedGroups.map(groupObj => groupObj.groupName).includes(group)} />)
       }
     </div>
   )

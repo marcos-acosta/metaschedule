@@ -16,6 +16,12 @@ const util = {
       college: split.at(-1)
     };
   },
+  militaryToAMPM(military) {
+    let [hh, mm] = military.split(":").map(x => parseInt(x));
+    let pm = hh >= 12;
+    hh = hh > 12 ? hh - 12 : hh;
+    return `${hh}:${`${mm}`.padStart(2, '0')} ${pm ? 'PM' : 'AM'}`;
+  },
   colors: [
     "course-group-blue",
     "course-group-purple",
@@ -29,11 +35,7 @@ const util = {
   SCRIPPS: "SC",
   POMONA: "PO",
   PITZER: "PZ",
-  militaryToAMPM(military) {
-    let [hh, mm] = military.split(":").map(x => parseInt(x));
-    let pm = hh >= 12;
-    hh = hh > 12 ? hh - 12 : hh;
-    return `${hh}:${`${mm}`.padStart(2, '0')} ${pm ? 'PM' : 'AM'}`;
-  }
+  COURSELIST: "COURSELIST",
+  SIDEBAR: "SIDEBAR"
 }
 export default util;

@@ -14,7 +14,7 @@ export default function CourseCard(props) {
     <div  className={`courseCard ${getCardColor(props.courseGroup)} ${props.expanded ? 'expanded' : ''}`}>
       <div className="courseGroup">{props.courseGroup}</div>
       <div className="courseTitle" onClick={() => props.setExpandedCourseGroup(props.expanded ? null : props.courseGroup)}>{props.courseData.groupName}</div>
-      <div className="addButton"  onClick={() => props.isAdded ? props.removeGroup(props.courseGroup) : props.addGroup(props.courseGroup)}>
+      <div className="addButton"  onClick={() => props.isAdded ? props.removeGroup(props.courseGroup) : props.addGroup(props.courseGroup, credits)}>
         <div className={`plus ${props.isAdded ? 'rotated45' : ''}`}>＋</div>
       </div>
       <div className={`courseDetails ${props.expanded ? "" : "hiddenDetails"}`}>
@@ -28,7 +28,6 @@ export default function CourseCard(props) {
               {
                 props.courseData.sections.map(sectionCode => {
                   let sectionData = props.getFullCourseData(sectionCode);
-                  // console.log(sectionData);
                   return <SectionCard section={sectionCode}
                                       seatsFilled={sectionData.courseSeatsFilled}
                                       seatsTotal={sectionData.courseSeatsTotal}
